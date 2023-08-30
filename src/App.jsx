@@ -1,12 +1,14 @@
-import { Routes } from 'react-router-dom'
-import { styled } from 'styled-components'
+import { Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './contexts/auth-context'
+import SignUpPage from './pages/SignUpPage'
 
 function App() {
   return (
     <div>
       <AuthProvider>
-        <Routes></Routes>
+        <Routes>
+          <Route path="/sign-up" element={<SignUpPage />}></Route>
+        </Routes>
       </AuthProvider>
     </div>
   )
