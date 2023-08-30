@@ -1,5 +1,15 @@
+import { Routes } from 'react-router-dom'
+import { styled } from 'styled-components'
+import { AuthProvider } from './contexts/auth-context'
+
 function App() {
-  return <></>
+  return (
+    <div>
+      <AuthProvider>
+        <Routes></Routes>
+      </AuthProvider>
+    </div>
+  )
 }
 
 export default App
