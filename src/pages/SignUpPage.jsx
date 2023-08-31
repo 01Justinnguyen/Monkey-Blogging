@@ -1,7 +1,10 @@
 import {} from 'react'
 import { styled } from 'styled-components'
+import { useForm } from 'react-hook-form'
 import { Label } from '@/components/label'
-
+import { Input } from '@/components/input'
+import { IconEyeClose } from '@/components/icon'
+import { Field } from '@/components/field'
 const SignUpPageStyle = styled.div`
   min-height: 100vh;
   padding: 40px;
@@ -15,32 +18,6 @@ const SignUpPageStyle = styled.div`
     font-size: 40px;
     margin-bottom: 60px;
   }
-  .field {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    row-gap: 20px;
-  }
-  .input {
-    width: 100%;
-    padding: 20px;
-    background-color: ${(props) => props.theme.grayLight};
-    border-radius: 6px;
-    outline: none !important;
-    font-weight: 500;
-    transition: all 0.2s linear;
-    border: 1px solid transparent;
-  }
-  input:focus {
-    background-color: white;
-    border-color: ${(props) => props.theme.primary};
-  }
-  input::-webkit-input-placeholder {
-    color: #84878b;
-  }
-  input::-moz-input-placeholder {
-    color: #84878b;
-  }
   .form {
     max-width: 600px;
     margin: 0 auto;
@@ -48,16 +25,41 @@ const SignUpPageStyle = styled.div`
 `
 
 const SignUpPage = () => {
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isValid, isSubmitting },
+    watch
+  } = useForm({})
+  const handleSignUp = (values) => {
+    console.log('🚀 ~ file: SignUpPage.jsx:34 ~ handleSignUp ~ values:', values)
+  }
   return (
     <SignUpPageStyle>
       <div className="container">
         <img className="logo" srcSet="/logo.png 2x" alt="monkey blogging logo" />
         <h1 className="heading">Monkey Blogging</h1>
-        <form className="form" action="">
-          <div className="field">
+        <form className="form" onSubmit={handleSubmit(handleSignUp)}>
+          <Field>
             <Label htmlFor="fullname">FullName</Label>
-            <input id="fullname" type="text" className="input" placeholder="Enter your fullname" />
-          </div>
+            <Input name="fullname" type="text" placeholder="Enter your fullname" control={control} />
+          </Field>
+          <Field>
+            <Label htmlFor="email">Email Address</Label>
+            <Input name="email" type="email" placeholder="Enter your email" control={control} />
+          </Field>
+          <Field>
+            <Label htmlFor="password">Password</Label>
+            <Input name="password" type="password" placeholder="Enter your password" control={control}>
+              <IconEyeClose className="input-icon" />
+            </Input>
+          </Field>
+          <Field>
+            <Label htmlFor="rePassword">Confirm Password</Label>
+            <Input name="rePassword" type="password" placeholder="Enter your confirm password" control={control}>
+              <IconEyeClose className="input-icon" />
+            </Input>
+          </Field>
         </form>
       </div>
     </SignUpPageStyle>
