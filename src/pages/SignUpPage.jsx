@@ -1,10 +1,11 @@
-import {} from 'react'
+import { useState } from 'react'
 import { styled } from 'styled-components'
 import { useForm } from 'react-hook-form'
 import { Label } from '@/components/label'
 import { Input } from '@/components/input'
 import { IconEyeClose } from '@/components/icon'
 import { Field } from '@/components/field'
+import { IconEyeOpen } from '../components/icon'
 const SignUpPageStyle = styled.div`
   min-height: 100vh;
   padding: 40px;
@@ -34,6 +35,9 @@ const SignUpPage = () => {
   const handleSignUp = (values) => {
     console.log('🚀 ~ file: SignUpPage.jsx:34 ~ handleSignUp ~ values:', values)
   }
+
+  const [togglePassword, setTogglePassword] = useState(false)
+  const [toggleRePassword, setToggleRePassword] = useState(false)
   return (
     <SignUpPageStyle>
       <div className="container">
@@ -50,14 +54,14 @@ const SignUpPage = () => {
           </Field>
           <Field>
             <Label htmlFor="password">Password</Label>
-            <Input name="password" type="password" placeholder="Enter your password" control={control}>
-              <IconEyeClose className="input-icon" />
+            <Input name="password" type={togglePassword ? 'text' : 'password'} placeholder="Enter your password" control={control}>
+              {togglePassword ? <IconEyeOpen onClick={() => setTogglePassword(false)} /> : <IconEyeClose onClick={() => setTogglePassword(true)} />}
             </Input>
           </Field>
           <Field>
             <Label htmlFor="rePassword">Confirm Password</Label>
-            <Input name="rePassword" type="password" placeholder="Enter your confirm password" control={control}>
-              <IconEyeClose className="input-icon" />
+            <Input name="rePassword" type={toggleRePassword ? 'text' : 'password'} placeholder="Enter your confirm password" control={control}>
+              {toggleRePassword ? <IconEyeOpen onClick={() => setToggleRePassword(false)} /> : <IconEyeClose onClick={() => setToggleRePassword(true)} />}
             </Input>
           </Field>
         </form>
