@@ -5,6 +5,12 @@ import react from '@vitejs/plugin-react-swc'
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: [{ find: '@', replacement: '/src' }]
+    alias: [
+      { find: '@', replacement: '/src' },
+      {
+        find: '^components',
+        replacement: '/src/components'
+      }
+    ]
   }
 })

@@ -6,6 +6,8 @@ import { Input } from '@/components/input'
 import { IconEyeClose } from '@/components/icon'
 import { Field } from '@/components/field'
 import { IconEyeOpen } from '../components/icon'
+import { Button } from '@/components/button'
+import { LoadingSpinner } from '@/components/loading'
 const SignUpPageStyle = styled.div`
   min-height: 100vh;
   padding: 40px;
@@ -64,6 +66,9 @@ const SignUpPage = () => {
               {toggleRePassword ? <IconEyeOpen onClick={() => setToggleRePassword(false)} /> : <IconEyeClose onClick={() => setToggleRePassword(true)} />}
             </Input>
           </Field>
+          <Button type="submit" disabled isLoading={false}>
+            Sign Up
+          </Button>
         </form>
       </div>
     </SignUpPageStyle>
