@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { styled } from 'styled-components'
 import { useForm } from 'react-hook-form'
 import { Label } from '@/components/label'
@@ -9,6 +9,7 @@ import { IconEyeOpen } from '../components/icon'
 import { Button } from '@/components/button'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { toast } from 'react-toastify'
 
 const SignUpPageStyle = styled.div`
   min-height: 100vh;
@@ -31,7 +32,7 @@ const SignUpPageStyle = styled.div`
 
 const schema = yup.object({
   fullname: yup.string().required('Please enter your fullname'),
-  email: yup.string().email('Please enter valid email address').required('Please enter your email'),
+  email: yup.string().required('Please enter your email').email('Please enter valid email address'),
   password: yup.string().min(8, 'Your password must be at least 8 character').required('Please enter your password'),
   rePassword: yup
     .string()
@@ -62,6 +63,13 @@ const SignUpPage = () => {
 
   const [togglePassword, setTogglePassword] = useState(false)
   const [toggleRePassword, setToggleRePassword] = useState(false)
+
+  useEffect(() => {
+    const arrErrors = Object.values(errors)
+    if (arrErrors.length > 0) {
+      toast.error(arrErrors[0]?.message)
+    }
+  }, [errors])
   return (
     <SignUpPageStyle>
       <div className="container">
