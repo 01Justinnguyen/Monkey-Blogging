@@ -10,6 +10,10 @@ import { Button } from '@/components/button'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { toast } from 'react-toastify'
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { auth, db } from '@/firebase/firebase-config'
+import { useNavigate } from 'react-router-dom'
+import { addDoc, collection } from 'firebase/firestore'
 
 const SignUpPageStyle = styled.div`
   min-height: 100vh;
@@ -33,7 +37,7 @@ const SignUpPageStyle = styled.div`
 const schema = yup.object({
   fullname: yup.string().required('Please enter your fullname'),
   email: yup.string().required('Please enter your email').email('Please enter valid email address'),
-  password: yup.string().min(8, 'Your password must be at least 8 character').required('Please enter your password'),
+  password: yup.string().required('Please enter your password').min(8, 'Your password must be at least 8 character'),
   rePassword: yup
     .string()
     .required('Please enter your confirm password')
@@ -41,6 +45,7 @@ const schema = yup.object({
 })
 
 const SignUpPage = () => {
+  const navigate = useNavigate()
   const {
     control,
     handleSubmit,
@@ -51,14 +56,20 @@ const SignUpPage = () => {
     resolver: yupResolver(schema),
     mode: 'onChange'
   })
-  const handleSignUp = (values) => {
+  const handleSignUp = async (values) => {
     if (!isValid) return
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve()
-        console.log('🚀 ~ file: SignUpPage.jsx:40 ~ handleSignUp ~ values:', values)
-      }, 5000)
+    const user = await createUserWithEmailAndPassword(auth, values.email, values.password)
+    await updateProfile(auth.currentUser, {
+      displayName: values.fullname
     })
+    const colRef = collection(db, 'users')
+    await addDoc(colRef, {
+      fullname: values.fullname,
+      email: values.email,
+      password: values.password
+    })
+    toast.success('Register successfully!!!')
+    navigate('/')
   }
 
   const [togglePassword, setTogglePassword] = useState(false)
