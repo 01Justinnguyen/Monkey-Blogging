@@ -7,7 +7,9 @@ import { IconEyeClose } from '@/components/icon'
 import { Field } from '@/components/field'
 import { IconEyeOpen } from '../components/icon'
 import { Button } from '@/components/button'
-import { LoadingSpinner } from '@/components/loading'
+import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
+
 const SignUpPageStyle = styled.div`
   min-height: 100vh;
   padding: 40px;
@@ -27,6 +29,16 @@ const SignUpPageStyle = styled.div`
   }
 `
 
+const schema = yup.object({
+  fullname: yup.string().required('Please enter your fullname'),
+  email: yup.string().email('Please enter valid email address').required('Please enter your email'),
+  password: yup.string().min(8, 'Your password must be at least 8 character').required('Please enter your password'),
+  rePassword: yup
+    .string()
+    .required('Please enter your confirm password')
+    .oneOf([yup.ref('password'), null], 'Passwords must match')
+})
+
 const SignUpPage = () => {
   const {
     control,
@@ -35,6 +47,7 @@ const SignUpPage = () => {
     watch,
     reset
   } = useForm({
+    resolver: yupResolver(schema),
     mode: 'onChange'
   })
   const handleSignUp = (values) => {
