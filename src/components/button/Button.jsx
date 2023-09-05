@@ -1,7 +1,7 @@
-import React from 'react'
+import {} from 'react'
 import styled from 'styled-components'
-import { LoadingSpinner } from '../loading'
-
+import { LoadingSpinner } from '@/components/loading'
+import PropTypes from 'prop-types'
 const ButtonStyles = styled.button`
   cursor: pointer;
   padding: 0 25px;
@@ -21,9 +21,16 @@ const ButtonStyles = styled.button`
     pointer-events: none;
   }
 `
+
+/**
+ * @requires
+ * @param {string} type Type of button 'button' | 'submit'
+ *
+ */
+
 const Button = ({ type = 'button', onClick = () => {}, children, ...props }) => {
   const { isLoading } = props
-  const child = !!isLoading ? <LoadingSpinner /> : children
+  const child = isLoading ? <LoadingSpinner /> : children
   return (
     <>
       <ButtonStyles type={type} onClick={onClick} {...props}>
@@ -31,6 +38,13 @@ const Button = ({ type = 'button', onClick = () => {}, children, ...props }) => 
       </ButtonStyles>
     </>
   )
+}
+
+Button.propTypes = {
+  type: PropTypes.oneOf(['button', 'submit']).isRequired,
+  onClick: PropTypes.func.isRequired,
+  children: PropTypes.node,
+  isLoading: PropTypes.bool
 }
 
 export default Button
