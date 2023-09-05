@@ -32,10 +32,19 @@ const SignUpPage = () => {
     control,
     handleSubmit,
     formState: { errors, isValid, isSubmitting },
-    watch
-  } = useForm({})
+    watch,
+    reset
+  } = useForm({
+    mode: 'onChange'
+  })
   const handleSignUp = (values) => {
-    console.log('🚀 ~ file: SignUpPage.jsx:34 ~ handleSignUp ~ values:', values)
+    if (!isValid) return
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve()
+        console.log('🚀 ~ file: SignUpPage.jsx:40 ~ handleSignUp ~ values:', values)
+      }, 5000)
+    })
   }
 
   const [togglePassword, setTogglePassword] = useState(false)
@@ -66,7 +75,14 @@ const SignUpPage = () => {
               {toggleRePassword ? <IconEyeOpen onClick={() => setToggleRePassword(false)} /> : <IconEyeClose onClick={() => setToggleRePassword(true)} />}
             </Input>
           </Field>
-          <Button type="submit" disabled isLoading={false}>
+          <Button
+            style={{
+              maxWidth: 300,
+              margin: '0 auto'
+            }}
+            type="submit"
+            isLoading={isSubmitting}
+            disabled={isSubmitting}>
             Sign Up
           </Button>
         </form>
