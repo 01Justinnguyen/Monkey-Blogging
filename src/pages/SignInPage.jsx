@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '@/contexts/auth-context'
 import { NavLink, useNavigate } from 'react-router-dom'
 import AuthenticationPage from './AuthenticationPage'
@@ -11,8 +11,7 @@ import { Field } from '@/components/field'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { toast } from 'react-toastify'
-import { async } from '@firebase/util'
-import { auth, db } from '@/firebase/firebase-config'
+import { auth } from '@/firebase/firebase-config'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 const schema = yup.object({
   email: yup.string().required('Please enter your email').email('Please enter valid email address'),
@@ -60,7 +59,7 @@ const SignInPage = () => {
           </Input>
         </Field>
         <div className="have-account">
-          Don't have an account? <NavLink to={'/sign-up'}>Register</NavLink>
+          Don&apos;t have an account? <NavLink to={'/sign-up'}>Register</NavLink>
         </div>
         <Button
           style={{

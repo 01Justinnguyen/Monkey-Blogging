@@ -6,7 +6,6 @@
 * {
   margin: 0;
   padding: 0;
-  font: inherit;
 }
 img,
 picture,
@@ -16,9 +15,10 @@ video {
   max-width: 100%;
 }
 input,
-select,
-textarea {
-  background-color: transparent;
+button,
+textarea,
+select {
+  font: inherit;
   outline: none;
 }
 button {
@@ -40,7 +40,12 @@ body {
 
 .container {
   width: 100%;
-  max-width: 1000px;
+  max-width: 1180px;
   margin: 0 auto;
   padding: 0 20px;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
 }

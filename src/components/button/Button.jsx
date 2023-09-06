@@ -10,7 +10,6 @@ const ButtonStyles = styled.button`
   border-radius: 8px;
   font-size: 18px;
   font-weight: 600;
-  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
