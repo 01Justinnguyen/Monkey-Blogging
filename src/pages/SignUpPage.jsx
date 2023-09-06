@@ -10,7 +10,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { toast } from 'react-toastify'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { auth, db } from '@/firebase/firebase-config'
-import { useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { addDoc, collection } from 'firebase/firestore'
 import AuthenticationPage from './AuthenticationPage'
 
@@ -25,6 +25,9 @@ const schema = yup.object({
 })
 
 const SignUpPage = () => {
+  useEffect(() => {
+    document.title = 'Register Page'
+  }, [])
   const navigate = useNavigate()
   const {
     control,
@@ -49,7 +52,7 @@ const SignUpPage = () => {
       password: values.password
     })
     toast.success('Register successfully!!!')
-    navigate('/')
+    navigate('/sign-in')
   }
 
   const [togglePassword, setTogglePassword] = useState(false)
@@ -84,6 +87,9 @@ const SignUpPage = () => {
             {toggleRePassword ? <IconEyeOpen onClick={() => setToggleRePassword(false)} /> : <IconEyeClose onClick={() => setToggleRePassword(true)} />}
           </Input>
         </Field>
+        <div className="have-account">
+          Already have an account? <NavLink to={'/sign-in'}>Login</NavLink>
+        </div>
         <Button
           style={{
             maxWidth: 300,
