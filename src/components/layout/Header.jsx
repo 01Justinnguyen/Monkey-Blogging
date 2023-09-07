@@ -71,7 +71,6 @@ function getName(name) {
 }
 const Header = () => {
   const { userInfo } = useAuth()
-  console.log('🚀 ~ file: Header.jsx:70 ~ Header ~ userInfo:', userInfo)
   return (
     <HeaderStyles>
       <div className="container">

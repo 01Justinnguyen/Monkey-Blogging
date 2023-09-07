@@ -92,10 +92,12 @@ const SignUpPage = () => {
         </div>
         <Button
           style={{
+            width: '100%',
             maxWidth: 300,
             margin: '0 auto'
           }}
           type="submit"
+          kind="primary"
           isloading={isSubmitting}
           disabled={isSubmitting}>
           Register
