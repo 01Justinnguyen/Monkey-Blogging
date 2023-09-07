@@ -4,9 +4,9 @@ import PropTypes from 'prop-types'
 const SpinnerStyles = styled.div`
   width: ${(props) => props.size};
   height: ${(props) => props.size};
-  border: ${(props) => props.borderSize} solid white;
-  border-top: ${(props) => props.borderSize} solid transparent;
-  border-bottom: ${(props) => props.borderSize} solid transparent;
+  border: ${(props) => props.bordersize} solid white;
+  border-top: ${(props) => props.bordersize} solid transparent;
+  border-bottom: ${(props) => props.bordersize} solid transparent;
   border-radius: 100rem;
   display: inline-block;
   animation: spinner 1s infinite linear;
@@ -17,13 +17,13 @@ const SpinnerStyles = styled.div`
   }
 `
 
-const LoadingSpinner = ({ size = '40px', borderSize = '5px' }) => {
-  return <SpinnerStyles size={size} borderSize={borderSize}></SpinnerStyles>
+const LoadingSpinner = ({ size = '40px', bordersize = '5px' }) => {
+  return <SpinnerStyles size={size} bordersize={bordersize}></SpinnerStyles>
 }
 
 LoadingSpinner.propTypes = {
   size: PropTypes.string,
-  borderSize: PropTypes.string
+  bordersize: PropTypes.string
 }
 
 export default LoadingSpinner

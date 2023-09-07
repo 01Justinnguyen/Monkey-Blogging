@@ -2,6 +2,7 @@ import {} from 'react'
 import styled from 'styled-components'
 import { LoadingSpinner } from '@/components/loading'
 import PropTypes from 'prop-types'
+import { NavLink } from 'react-router-dom'
 const ButtonStyles = styled.button`
   cursor: pointer;
   padding: 0 25px;
@@ -28,8 +29,17 @@ const ButtonStyles = styled.button`
  */
 
 const Button = ({ type = 'button', onClick = () => {}, children, ...props }) => {
-  const { isLoading } = props
-  const child = isLoading ? <LoadingSpinner /> : children
+  const { isloading, to } = props
+  const child = !!isloading ? <LoadingSpinner /> : children
+  if (to !== '' && typeof to === 'string') {
+    return (
+      <NavLink to={to}>
+        <ButtonStyles type={type} {...props}>
+          {child}
+        </ButtonStyles>
+      </NavLink>
+    )
+  }
   return (
     <>
       <ButtonStyles type={type} onClick={onClick} {...props}>
@@ -40,10 +50,11 @@ const Button = ({ type = 'button', onClick = () => {}, children, ...props }) => 
 }
 
 Button.propTypes = {
-  type: PropTypes.oneOf(['button', 'submit']).isRequired,
-  onClick: PropTypes.func.isRequired,
+  type: PropTypes.oneOf(['button', 'submit']),
+  onClick: PropTypes.func,
   children: PropTypes.node,
-  isLoading: PropTypes.bool
+  isloading: PropTypes.bool,
+  to: PropTypes.string
 }
 
 export default Button

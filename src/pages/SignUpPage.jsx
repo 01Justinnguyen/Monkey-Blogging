@@ -96,9 +96,9 @@ const SignUpPage = () => {
             margin: '0 auto'
           }}
           type="submit"
-          isLoading={isSubmitting}
+          isloading={isSubmitting}
           disabled={isSubmitting}>
-          Sign Up
+          Register
         </Button>
       </form>
     </AuthenticationPage>

@@ -2,6 +2,7 @@ import {} from 'react'
 import { styled } from 'styled-components'
 import { Button } from '@/components/button'
 import { NavLink } from 'react-router-dom'
+import { useAuth } from '@/contexts/auth-context'
 const menuLinks = [
   {
     url: '/#',
@@ -63,8 +64,14 @@ const HeaderStyles = styled.header`
     margin-left: 20px;
   }
 `
-
+function getName(name) {
+  if (!name) return 'User'
+  const length = name.split(' ').length
+  return name.split(' ')[length - 1]
+}
 const Header = () => {
+  const { userInfo } = useAuth()
+  console.log('🚀 ~ file: Header.jsx:70 ~ Header ~ userInfo:', userInfo)
   return (
     <HeaderStyles>
       <div className="container">
@@ -92,9 +99,16 @@ const Header = () => {
             </span>
           </div>
 
-          <Button height="56px" className="header-button">
-            Sign Up
-          </Button>
+          {!userInfo ? (
+            <Button type="button" to="/sign-up" height="56px" className="header-button">
+              Sign Up
+            </Button>
+          ) : (
+            <div className="header-auth">
+              <strong>Welcome back, </strong>
+              <strong className="text-primary">{getName(userInfo?.displayName)}</strong>
+            </div>
+          )}
         </div>
       </div>
     </HeaderStyles>

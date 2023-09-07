@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
-import { AuthProvider } from './contexts/auth-context'
+import { AuthProvider } from '@/contexts/auth-context'
 import Homepage from './pages/Homepage'
 import NotFoundPage from './pages/NotFoundPage'
 import SignInPage from './pages/SignInPage'
@@ -13,7 +13,7 @@ function App() {
           <Route path="/" element={<Homepage />}></Route>
           <Route path="/sign-up" element={<SignUpPage />}></Route>
           <Route path="/sign-in" element={<SignInPage />}></Route>
-          <Route path="/*" element={<NotFoundPage />}></Route>
+          <Route path="*" element={<NotFoundPage />}></Route>
         </Routes>
       </AuthProvider>
     </div>

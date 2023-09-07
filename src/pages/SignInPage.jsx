@@ -19,13 +19,13 @@ const schema = yup.object({
 })
 
 const SignInPage = () => {
-  const navigate = useNavigate()
-  const { userInfo } = useAuth()
   useEffect(() => {
     document.title = 'Login Page'
-    if (userInfo?.email) navigate('/')
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  const navigate = useNavigate()
+  const { userInfo, setUserInfo } = useAuth()
+  console.log(auth)
+
   const [togglePassword, setTogglePassword] = useState(false)
   const {
     control,
@@ -35,16 +35,22 @@ const SignInPage = () => {
     resolver: yupResolver(schema),
     mode: 'onChange'
   })
-  const handleSignIn = async (values) => {
-    if (!isValid) await signInWithEmailAndPassword(auth, values.email, values.password)
-    navigate('/')
-  }
   useEffect(() => {
     const arrErrors = Object.values(errors)
     if (arrErrors.length > 0) {
       toast.error(arrErrors[0]?.message)
     }
   }, [errors])
+  const handleSignIn = async (values) => {
+    if (!isValid) return
+    try {
+      await signInWithEmailAndPassword(auth, values.email, values.password)
+      navigate('/')
+    } catch (error) {
+      if (error.message.includes('wrong-password')) toast.error('It seems your password was wrong')
+    }
+  }
+
   return (
     <AuthenticationPage>
       <form className="form" onSubmit={handleSubmit(handleSignIn)}>
@@ -67,9 +73,9 @@ const SignInPage = () => {
             margin: '0 auto'
           }}
           type="submit"
-          isLoading={isSubmitting}
+          isloading={isSubmitting}
           disabled={isSubmitting}>
-          Sign Up
+          Login
         </Button>
       </form>
     </AuthenticationPage>
