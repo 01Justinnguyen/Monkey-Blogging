@@ -1,6 +1,7 @@
 import {} from 'react'
 import styled from 'styled-components'
 import PostCategory from './PostCategory'
+import PostMeta from './PostMeta'
 import PostTitle from './PostTitle'
 const PostNewestItemStyles = styled.div`
   display: flex;
@@ -30,22 +31,6 @@ const PostNewestItemStyles = styled.div`
     &-category {
       margin-bottom: 8px;
     }
-    &-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      margin-left: auto;
-      color: #6b6b6b;
-    }
-    &-dot {
-      display: inline-block;
-      width: 4px;
-      height: 4px;
-      background-color: currentColor;
-      border-radius: 100rem;
-    }
     &-title {
       margin-bottom: 8px;
     }
@@ -60,11 +45,7 @@ const PostNewestItem = () => {
       <div className="post-content">
         <PostCategory type="secondary">Kiến thức</PostCategory>
         <PostTitle>Hướng dẫn setup phòng cực chill dành cho người mới toàn tập</PostTitle>
-        <div className="post-info">
-          <span className="post-time">Mar 23</span>
-          <span className="post-dot"></span>
-          <span className="post-author">Andiez Le</span>
-        </div>
+        <PostMeta></PostMeta>
       </div>
     </PostNewestItemStyles>
   )
