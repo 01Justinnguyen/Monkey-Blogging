@@ -1,6 +1,7 @@
 import {} from 'react'
 import styled, { css } from 'styled-components'
 import PropTypes from 'prop-types'
+import { NavLink } from 'react-router-dom'
 const PostCategoryStyles = styled.div`
   display: inline-block;
   padding: 6px 10px;
@@ -9,6 +10,15 @@ const PostCategoryStyles = styled.div`
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
+
+  a {
+    display: block;
+    &:hover {
+      color: ${(props) => props.theme.primary};
+      opacity: 0.8;
+      transition: all 0.5s ease;
+    }
+  }
 
   ${(props) =>
     props.type === 'primary' &&
@@ -23,10 +33,10 @@ const PostCategoryStyles = styled.div`
     `};
 `
 
-const PostCategory = ({ children, type = 'primary', className = '' }) => {
+const PostCategory = ({ children, type = 'primary', className = '', to = '/' }) => {
   return (
     <PostCategoryStyles type={type} className={`post-category ${className}`}>
-      {children}
+      <NavLink to={to}>{children}</NavLink>
     </PostCategoryStyles>
   )
 }
@@ -34,7 +44,8 @@ const PostCategory = ({ children, type = 'primary', className = '' }) => {
 PostCategory.propTypes = {
   children: PropTypes.node,
   type: PropTypes.oneOf(['primary', 'secondary']),
-  className: PropTypes.string
+  className: PropTypes.string,
+  to: PropTypes.string
 }
 
 export default PostCategory
