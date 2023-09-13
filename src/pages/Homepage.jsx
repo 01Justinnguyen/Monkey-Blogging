@@ -1,4 +1,4 @@
-import React from 'react'
+import {} from 'react'
 import { auth, db } from '@/firebase/firebase-config'
 import { signOut } from 'firebase/auth'
 import { styled } from 'styled-components'

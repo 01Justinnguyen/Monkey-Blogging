@@ -1,7 +1,7 @@
 import PostItem from '@/module/post/PostItem'
 import PostNewestItem from '@/module/post/PostNewestItem'
 import PostNewestLarge from '@/module/post/PostNewestLarge'
-import React from 'react'
+import {} from 'react'
 import styled from 'styled-components'
 import Heading from '../../components/layout/Heading'
 

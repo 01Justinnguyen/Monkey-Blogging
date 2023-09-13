@@ -1,5 +1,5 @@
 import PostFeatureItem from '@/module/post/PostFeatureItem'
-import React from 'react'
+import {} from 'react'
 import styled from 'styled-components'
 import Heading from '../../components/layout/Heading'
 const HomeFeatureStyles = styled.div``
