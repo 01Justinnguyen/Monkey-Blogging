@@ -37,7 +37,7 @@ const Button = ({ type = 'button', onClick = () => {}, kind = 'secondary', child
   const child = !!isloading ? <LoadingSpinner /> : children
   if (to !== '' && typeof to === 'string') {
     return (
-      <NavLink to={to} style={{ display: 'inline-block' }}>
+      <NavLink to={to} className="inline-block">
         <ButtonStyles kind={kind} type={type} {...props}>
           {child}
         </ButtonStyles>

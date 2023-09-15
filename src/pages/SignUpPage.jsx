@@ -85,16 +85,7 @@ const SignUpPage = () => {
         <div className="have-account">
           Already have an account? <NavLink to={'/sign-in'}>Login</NavLink>
         </div>
-        <Button
-          style={{
-            width: '100%',
-            maxWidth: 300,
-            margin: '0 auto'
-          }}
-          type="submit"
-          kind="primary"
-          isloading={isSubmitting}
-          disabled={isSubmitting}>
+        <Button className="w-[100%] max-w-[300px] mx-auto" type="submit" kind="primary" isloading={isSubmitting} disabled={isSubmitting}>
           Register
         </Button>
       </form>
