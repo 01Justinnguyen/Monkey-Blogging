@@ -13,6 +13,7 @@ import { auth, db } from '@/firebase/firebase-config'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { addDoc, collection } from 'firebase/firestore'
 import AuthenticationPage from './AuthenticationPage'
+import InputPasswordToggle from '@/components/input/InputPasswordToggle'
 
 const schema = yup.object({
   fullname: yup.string().required('Please enter your fullname'),
@@ -76,16 +77,10 @@ const SignUpPage = () => {
           <Input name="email" type="email" placeholder="Enter your email" control={control} />
         </Field>
         <Field>
-          <Label htmlFor="password">Password</Label>
-          <Input name="password" type={togglePassword ? 'text' : 'password'} placeholder="Enter your password" control={control}>
-            {togglePassword ? <IconEyeOpen onClick={() => setTogglePassword(false)} /> : <IconEyeClose onClick={() => setTogglePassword(true)} />}
-          </Input>
+          <InputPasswordToggle name="password" control={control} label="Password" />
         </Field>
         <Field>
-          <Label htmlFor="rePassword">Confirm Password</Label>
-          <Input name="rePassword" type={toggleRePassword ? 'text' : 'password'} placeholder="Enter your confirm password" control={control}>
-            {toggleRePassword ? <IconEyeOpen onClick={() => setToggleRePassword(false)} /> : <IconEyeClose onClick={() => setToggleRePassword(true)} />}
-          </Input>
+          <InputPasswordToggle name="rePassword" control={control} label="Confirm password" />
         </Field>
         <div className="have-account">
           Already have an account? <NavLink to={'/sign-in'}>Login</NavLink>
