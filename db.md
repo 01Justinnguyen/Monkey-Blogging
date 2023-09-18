@@ -26,6 +26,7 @@
 - displayName
 - email
 - password
+- avatar
 - status: 1(active) 2(pending) 3(ban)
 - roles: 1(admin) 2(mod) 3(user)
 - permissions: 'ADD_POST'
