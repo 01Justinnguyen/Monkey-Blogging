@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button } from '@/components/button'
-import { Checkbox, Radio } from '@/components/checkbox'
+import { Radio } from '@/components/checkbox'
 import { Dropdown } from '@/components/dropdown'
 import { Field } from '@/components/field'
 import { Input } from '@/components/input'
@@ -9,11 +9,11 @@ import { useForm } from 'react-hook-form'
 import styled from 'styled-components'
 import slugify from 'slugify'
 import { postStatus } from '@/utils/constants'
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage'
 import ImageUpload from '@/components/image/ImageUpload'
 const PostAddNewStyles = styled.div``
 const PostAddNew = () => {
-  const { control, watch, setValue, handleSubmit } = useForm({
+  const { control, watch, setValue, handleSubmit, getValues } = useForm({
     mode: 'onChange',
     defaultValues: {
       title: '',
@@ -38,7 +38,6 @@ const PostAddNew = () => {
 
   const handleUploadImage = (file) => {
     const storage = getStorage()
-
     const storageRef = ref(storage, 'images/' + file.name)
     const uploadTask = uploadBytesResumable(storageRef, file)
 
@@ -76,8 +75,22 @@ const PostAddNew = () => {
   const onSelectImage = (e) => {
     const file = e.target.files[0]
     if (!file) return
-    setValue('image', file)
+    setValue('imageName', file.name)
     handleUploadImage(file)
+  }
+
+  const handleDeleteImage = () => {
+    const storage = getStorage()
+    const imageRef = ref(storage, 'images/' + getValues('imageName'))
+    deleteObject(imageRef)
+      .then(() => {
+        console.log('Xoá thành công ảnh rồi nhé')
+        setImage('')
+        setProgress(0)
+      })
+      .catch((error) => {
+        console.log('Errors: ', error)
+      })
   }
   return (
     <PostAddNewStyles>
@@ -94,7 +107,7 @@ const PostAddNew = () => {
           </Field>
           <Field>
             <Label>Image</Label>
-            <ImageUpload onChange={onSelectImage} progress={progress} image={image} />
+            <ImageUpload onChange={onSelectImage} progress={progress} image={image} handleDeleteImage={handleDeleteImage} />
           </Field>
         </div>
         <div className="grid grid-cols-2 mb-10 gap-x-10">

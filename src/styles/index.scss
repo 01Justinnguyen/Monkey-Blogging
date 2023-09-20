@@ -12,6 +12,11 @@
     color: #232323;
   }
 }
+
+.loading {
+  @apply absolute z-10 w-14 h-14 border-8 border-green-500 rounded-full border-t-transparent animate-spin;
+}
+
 .container {
   width: 100%;
   max-width: 1260px;
