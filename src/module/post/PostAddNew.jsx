@@ -1,4 +1,4 @@
-import {} from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/button'
 import { Checkbox, Radio } from '@/components/checkbox'
 import { Dropdown } from '@/components/dropdown'
@@ -10,6 +10,7 @@ import styled from 'styled-components'
 import slugify from 'slugify'
 import { postStatus } from '@/utils/constants'
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
+import ImageUpload from '@/components/image/ImageUpload'
 const PostAddNewStyles = styled.div``
 const PostAddNew = () => {
   const { control, watch, setValue, handleSubmit } = useForm({
@@ -32,6 +33,9 @@ const PostAddNew = () => {
     // handleUploadImage(cloneValues.image)
   }
 
+  const [progress, setProgress] = useState(0)
+  const [image, setImage] = useState('')
+
   const handleUploadImage = (file) => {
     const storage = getStorage()
 
@@ -42,8 +46,9 @@ const PostAddNew = () => {
       'state_changed',
       (snapshot) => {
         // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        console.log('Upload is ' + progress + '% done')
+        const progressPercent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        console.log('Upload is ' + progressPercent + '% done')
+        setProgress(progressPercent)
         switch (snapshot.state) {
           case 'paused':
             console.log('Upload is paused')
@@ -62,6 +67,7 @@ const PostAddNew = () => {
         // Upload completed successfully, now we can get the download URL
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           console.log('File available at', downloadURL)
+          setImage(downloadURL)
         })
       }
     )
@@ -71,6 +77,7 @@ const PostAddNew = () => {
     const file = e.target.files[0]
     if (!file) return
     setValue('image', file)
+    handleUploadImage(file)
   }
   return (
     <PostAddNewStyles>
@@ -87,7 +94,7 @@ const PostAddNew = () => {
           </Field>
           <Field>
             <Label>Image</Label>
-            <input type="file" name="image" onChange={onSelectImage} accept="image/*" />
+            <ImageUpload onChange={onSelectImage} progress={progress} image={image} />
           </Field>
         </div>
         <div className="grid grid-cols-2 mb-10 gap-x-10">
