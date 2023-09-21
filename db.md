@@ -6,6 +6,7 @@
 - title
 - slug
 - image
+- hot(boolean: true | false)
 - createdAt
 - status: 1(approved) 2(pending) 3(reject)
 - content
