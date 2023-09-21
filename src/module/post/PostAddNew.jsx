@@ -11,6 +11,7 @@ import slugify from 'slugify'
 import { postStatus } from '@/utils/constants'
 import ImageUpload from '@/components/image/ImageUpload'
 import useFireBaseImage from '@/hooks/useFirebaseImage'
+import Toggle from '@/components/toggle/Toggle'
 const PostAddNewStyles = styled.div``
 const PostAddNew = () => {
   const { control, watch, setValue, handleSubmit, getValues } = useForm({
@@ -23,6 +24,8 @@ const PostAddNew = () => {
     }
   })
   const watchStatus = watch('status')
+  const watchHot = watch('hot')
+  console.log('🐻 ~ file: PostAddNew.jsx:28 ~ PostAddNew ~ watchHot:', watchHot)
   // eslint-disable-next-line no-unused-vars
   // const watchCategory = watch('category')
 
@@ -76,16 +79,9 @@ const PostAddNew = () => {
         </div>
         <div className="grid grid-cols-2 mb-10 gap-x-10">
           <Field>
-            <Label>Category</Label>
-            <Dropdown>
-              <Dropdown.Option>Knowledge</Dropdown.Option>
-              <Dropdown.Option>Blockchain</Dropdown.Option>
-              <Dropdown.Option>Setup</Dropdown.Option>
-              <Dropdown.Option>Nature</Dropdown.Option>
-              <Dropdown.Option>Developer</Dropdown.Option>
-            </Dropdown>
+            <Label>Feature post</Label>
+            <Toggle on={watchHot === true} onClick={() => setValue('hot', !watchHot)} />
           </Field>
-          <Field></Field>
         </div>
         <Button kind="primary" type="submit" className="mx-auto">
           Add new post
