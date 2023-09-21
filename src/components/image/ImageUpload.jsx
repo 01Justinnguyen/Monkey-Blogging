@@ -4,8 +4,11 @@ import PropTypes from 'prop-types'
 const ImageUpload = (props) => {
   const { name, className = '', progress = 0, image = '', handleDeleteImage = () => {}, ...rest } = props
   return (
-    <label className={`cursor-pointer flex items-center justify-center border border-dashed w-full min-h-[200px] rounded-lg ${className} relative overflow-hidden group`}>
-      <input type="file" name={name} className="hidden-input" onChange={() => {}} {...rest} />
+    <label
+      className={`cursor-pointer flex items-center justify-center border border-dashed w-full min-h-[200px] rounded-lg ${className} relative overflow-hidden group ${
+        progress ? 'pointer-events-none' : ''
+      }`}>
+      <input type="file" name={name} className={`hidden-input`} onChange={() => {}} {...rest} />
 
       {!image && progress === 0 && (
         <div className="flex flex-col items-center text-center pointer-events-none">

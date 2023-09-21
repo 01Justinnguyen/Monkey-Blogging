@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import {} from 'react'
 import { Button } from '@/components/button'
 import { Radio } from '@/components/checkbox'
 import { Dropdown } from '@/components/dropdown'
@@ -9,8 +9,8 @@ import { useForm } from 'react-hook-form'
 import styled from 'styled-components'
 import slugify from 'slugify'
 import { postStatus } from '@/utils/constants'
-import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage'
 import ImageUpload from '@/components/image/ImageUpload'
+import useFireBaseImage from '@/hooks/useFirebaseImage'
 const PostAddNewStyles = styled.div``
 const PostAddNew = () => {
   const { control, watch, setValue, handleSubmit, getValues } = useForm({
@@ -23,7 +23,8 @@ const PostAddNew = () => {
     }
   })
   const watchStatus = watch('status')
-  const watchCategory = watch('category')
+  // eslint-disable-next-line no-unused-vars
+  // const watchCategory = watch('category')
 
   const addPostHandler = async (values) => {
     const cloneValues = { ...values }
@@ -33,65 +34,8 @@ const PostAddNew = () => {
     // handleUploadImage(cloneValues.image)
   }
 
-  const [progress, setProgress] = useState(0)
-  const [image, setImage] = useState('')
+  const { image, progress, handleSelectImage, handleDeleteImage } = useFireBaseImage(setValue, getValues)
 
-  const handleUploadImage = (file) => {
-    const storage = getStorage()
-    const storageRef = ref(storage, 'images/' + file.name)
-    const uploadTask = uploadBytesResumable(storageRef, file)
-
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-        const progressPercent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        console.log('Upload is ' + progressPercent + '% done')
-        setProgress(progressPercent)
-        switch (snapshot.state) {
-          case 'paused':
-            console.log('Upload is paused')
-            break
-          case 'running':
-            console.log('Upload is running')
-            break
-          default:
-            console.log('Nothing at all')
-        }
-      },
-      (error) => {
-        console.log('Error:', error.message)
-      },
-      () => {
-        // Upload completed successfully, now we can get the download URL
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          console.log('File available at', downloadURL)
-          setImage(downloadURL)
-        })
-      }
-    )
-  }
-
-  const onSelectImage = (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-    setValue('imageName', file.name)
-    handleUploadImage(file)
-  }
-
-  const handleDeleteImage = () => {
-    const storage = getStorage()
-    const imageRef = ref(storage, 'images/' + getValues('imageName'))
-    deleteObject(imageRef)
-      .then(() => {
-        console.log('Xoá thành công ảnh rồi nhé')
-        setImage('')
-        setProgress(0)
-      })
-      .catch((error) => {
-        console.log('Errors: ', error)
-      })
-  }
   return (
     <PostAddNewStyles>
       <h1 className="dashboard-heading">Add new post</h1>
@@ -107,7 +51,7 @@ const PostAddNew = () => {
           </Field>
           <Field>
             <Label>Image</Label>
-            <ImageUpload onChange={onSelectImage} progress={progress} image={image} handleDeleteImage={handleDeleteImage} />
+            <ImageUpload onChange={handleSelectImage} progress={progress} image={image} handleDeleteImage={handleDeleteImage} />
           </Field>
         </div>
         <div className="grid grid-cols-2 mb-10 gap-x-10">
