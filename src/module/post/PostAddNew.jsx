@@ -1,7 +1,6 @@
-import {} from 'react'
+import { useEffect } from 'react'
 import { Button } from '@/components/button'
 import { Radio } from '@/components/checkbox'
-import { Dropdown } from '@/components/dropdown'
 import { Field } from '@/components/field'
 import { Input } from '@/components/input'
 import { Label } from '@/components/label'
@@ -12,6 +11,8 @@ import { postStatus } from '@/utils/constants'
 import ImageUpload from '@/components/image/ImageUpload'
 import useFireBaseImage from '@/hooks/useFirebaseImage'
 import Toggle from '@/components/toggle/Toggle'
+import { collection, getDocs, query, where } from 'firebase/firestore'
+import { db } from '@/firebase/firebase-config'
 const PostAddNewStyles = styled.div``
 const PostAddNew = () => {
   const { control, watch, setValue, handleSubmit, getValues } = useForm({
@@ -39,6 +40,24 @@ const PostAddNew = () => {
 
   const { image, progress, handleSelectImage, handleDeleteImage } = useFireBaseImage(setValue, getValues)
 
+  //handle get categories
+  useEffect(() => {
+    async function getCategories() {
+      const colRef = collection(db, 'categories')
+      const q = query(colRef, where('status', '==', 1))
+      const querySnapshot = await getDocs(q)
+      let listCategories = []
+      querySnapshot.forEach((doc) => {
+        listCategories.push({
+          id: doc.id,
+          ...doc.data()
+        })
+      })
+      console.log('🐻 ~ file: PostAddNew.jsx:51 ~ getCategories ~ listCategories:', listCategories)
+    }
+    getCategories()
+  }, [])
+
   return (
     <PostAddNewStyles>
       <h1 className="dashboard-heading">Add new post</h1>
@@ -55,6 +74,9 @@ const PostAddNew = () => {
           <Field>
             <Label>Image</Label>
             <ImageUpload onChange={handleSelectImage} progress={progress} image={image} handleDeleteImage={handleDeleteImage} />
+          </Field>
+          <Field>
+            <Label>Categories</Label>
           </Field>
         </div>
         <div className="grid grid-cols-2 mb-10 gap-x-10">
