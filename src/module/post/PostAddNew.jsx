@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/button'
 import { Radio } from '@/components/checkbox'
 import { Field } from '@/components/field'
@@ -13,6 +13,7 @@ import useFireBaseImage from '@/hooks/useFirebaseImage'
 import Toggle from '@/components/toggle/Toggle'
 import { collection, getDocs, query, where } from 'firebase/firestore'
 import { db } from '@/firebase/firebase-config'
+import { Dropdown } from '@/components/dropdown'
 const PostAddNewStyles = styled.div``
 const PostAddNew = () => {
   const { control, watch, setValue, handleSubmit, getValues } = useForm({
@@ -20,8 +21,7 @@ const PostAddNew = () => {
     defaultValues: {
       title: '',
       slug: '',
-      status: 2,
-      category: ''
+      status: 2
     }
   })
   const watchStatus = watch('status')
@@ -40,6 +40,7 @@ const PostAddNew = () => {
 
   const { image, progress, handleSelectImage, handleDeleteImage } = useFireBaseImage(setValue, getValues)
 
+  const [categories, setCategories] = useState([])
   //handle get categories
   useEffect(() => {
     async function getCategories() {
@@ -53,7 +54,7 @@ const PostAddNew = () => {
           ...doc.data()
         })
       })
-      console.log('🐻 ~ file: PostAddNew.jsx:51 ~ getCategories ~ listCategories:', listCategories)
+      setCategories(listCategories)
     }
     getCategories()
   }, [])
@@ -77,6 +78,17 @@ const PostAddNew = () => {
           </Field>
           <Field>
             <Label>Categories</Label>
+            <Dropdown>
+              <Dropdown.Select placeholder="Select the category" />
+              <Dropdown.List>
+                {categories.length > 0 &&
+                  categories.map((category) => (
+                    <Dropdown.Option key={category.id} onClick={() => setValue('categoryId', category.id)}>
+                      {category.name}
+                    </Dropdown.Option>
+                  ))}
+              </Dropdown.List>
+            </Dropdown>
           </Field>
         </div>
         <div className="grid grid-cols-2 mb-10 gap-x-10">
