@@ -13,6 +13,12 @@ const DashboardStyles = styled.div`
       padding: 40px 20px;
       gap: 0 40px;
     }
+    &-heading {
+      font-weight: bold;
+      font-size: 25px;
+      margin-bottom: 10px;
+      color: ${(props) => props.theme.primary};
+    }
   }
 `
 const DashboardLayout = ({ children }) => {
