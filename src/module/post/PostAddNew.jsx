@@ -19,16 +19,20 @@ import { toast } from 'react-toastify'
 const PostAddNewStyles = styled.div``
 const PostAddNew = () => {
   const { userInfo } = useAuth()
-  const { control, watch, setValue, handleSubmit, getValues } = useForm({
+  const { control, watch, setValue, handleSubmit, getValues, reset } = useForm({
     mode: 'onChange',
     defaultValues: {
+      image: '',
       title: '',
       slug: '',
-      status: 2
+      status: 2,
+      categoryId: '',
+      hot: false
     }
   })
   const { image, progress, handleSelectImage, handleDeleteImage } = useFireBaseImage(setValue, getValues)
   const [categories, setCategories] = useState([])
+  const [selectCategory, setSelectCategory] = useState({})
   const watchStatus = watch('status')
   const watchHot = watch('hot')
   // eslint-disable-next-line no-unused-vars
@@ -45,8 +49,15 @@ const PostAddNew = () => {
       userId: userInfo.uid
     })
     toast.success('Create a new post succesfully!!!')
-    console.log('🐻 ~ file: PostAddNew.jsx:31 ~ addPostHandler ~ cloneValues:', cloneValues)
-    // handleUploadImage(cloneValues.image)
+    reset({
+      title: '',
+      slug: '',
+      status: 2,
+      categoryId: '',
+      hot: false,
+      image: ''
+    })
+    setSelectCategory({})
   }
 
   //handle get categories
@@ -66,6 +77,21 @@ const PostAddNew = () => {
     }
     getCategories()
   }, [])
+
+  const handleClickOption = (category) => {
+    setValue('categoryId', category.id)
+    setSelectCategory(category)
+  }
+
+  function capitalizeFirstLetter(inputString) {
+    // Kiểm tra xem chuỗi đầu vào có độ dài là 0 không
+    if (inputString.length === 0) {
+      return inputString
+    }
+
+    // Chuyển chữ cái đầu tiên thành chữ hoa và nối với phần còn lại của chuỗi
+    return inputString.charAt(0).toUpperCase() + inputString.slice(1)
+  }
 
   return (
     <PostAddNewStyles>
@@ -87,16 +113,17 @@ const PostAddNew = () => {
           <Field>
             <Label>Categories</Label>
             <Dropdown>
-              <Dropdown.Select placeholder="Select the category" />
+              <Dropdown.Select placeholder={capitalizeFirstLetter(`${selectCategory?.name || 'Select category'}`)} />
               <Dropdown.List>
                 {categories.length > 0 &&
                   categories.map((category) => (
-                    <Dropdown.Option key={category.id} onClick={() => setValue('categoryId', category.id)}>
+                    <Dropdown.Option key={category.id} onClick={() => handleClickOption(category)}>
                       {category.name}
                     </Dropdown.Option>
                   ))}
               </Dropdown.List>
             </Dropdown>
+            {selectCategory?.name && <span className="inline-block p-3 text-sm font-medium text-green-600 rounded-lg bg-green-50">{selectCategory?.name}</span>}
           </Field>
         </div>
         <div className="grid grid-cols-2 mb-10 gap-x-10">
