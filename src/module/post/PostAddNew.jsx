@@ -11,11 +11,14 @@ import { postStatus } from '@/utils/constants'
 import ImageUpload from '@/components/image/ImageUpload'
 import useFireBaseImage from '@/hooks/useFirebaseImage'
 import Toggle from '@/components/toggle/Toggle'
-import { collection, getDocs, query, where } from 'firebase/firestore'
+import { addDoc, collection, getDocs, query, where } from 'firebase/firestore'
 import { db } from '@/firebase/firebase-config'
 import { Dropdown } from '@/components/dropdown'
+import { useAuth } from '@/contexts/auth-context'
+import { toast } from 'react-toastify'
 const PostAddNewStyles = styled.div``
 const PostAddNew = () => {
+  const { userInfo } = useAuth()
   const { control, watch, setValue, handleSubmit, getValues } = useForm({
     mode: 'onChange',
     defaultValues: {
@@ -24,23 +27,28 @@ const PostAddNew = () => {
       status: 2
     }
   })
+  const { image, progress, handleSelectImage, handleDeleteImage } = useFireBaseImage(setValue, getValues)
+  const [categories, setCategories] = useState([])
   const watchStatus = watch('status')
   const watchHot = watch('hot')
-  console.log('🐻 ~ file: PostAddNew.jsx:28 ~ PostAddNew ~ watchHot:', watchHot)
   // eslint-disable-next-line no-unused-vars
   // const watchCategory = watch('category')
 
   const addPostHandler = async (values) => {
     const cloneValues = { ...values }
-    cloneValues.slug = slugify(values.slug || values.title)
+    cloneValues.slug = slugify(values.slug || values.title, { lower: true })
     cloneValues.status = Number(values.status)
+    const colRef = collection(db, 'posts')
+    await addDoc(colRef, {
+      ...cloneValues,
+      image,
+      userId: userInfo.uid
+    })
+    toast.success('Create a new post succesfully!!!')
     console.log('🐻 ~ file: PostAddNew.jsx:31 ~ addPostHandler ~ cloneValues:', cloneValues)
     // handleUploadImage(cloneValues.image)
   }
 
-  const { image, progress, handleSelectImage, handleDeleteImage } = useFireBaseImage(setValue, getValues)
-
-  const [categories, setCategories] = useState([])
   //handle get categories
   useEffect(() => {
     async function getCategories() {
