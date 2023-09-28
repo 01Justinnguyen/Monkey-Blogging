@@ -1,4 +1,6 @@
-import {} from 'react'
+import { db } from '@/firebase/firebase-config'
+import { doc, getDoc } from 'firebase/firestore'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import PostCategory from './PostCategory'
 import PostImage from './PostImage'
@@ -42,20 +44,29 @@ const PostFeatureItemStyles = styled.div`
     height: 272px;
   }
 `
-const PostFeatureItem = () => {
+const PostFeatureItem = (props) => {
+  const { data } = props
+  console.log('🐻 ~ file: PostFeatureItem.jsx:49 ~ PostFeatureItem ~ data:', data)
+  const [category, setCategory] = useState('')
+  useEffect(() => {
+    async function fetchData() {
+      const docRef = doc(db, 'categories', data.categoryId)
+      const docSnap = await getDoc(docRef)
+      setCategory(docSnap.data())
+    }
+    fetchData()
+  }, [data.categoryId])
+  if (!data || !data.id) return null
   return (
     <PostFeatureItemStyles>
-      <PostImage
-        url="https://images.unsplash.com/photo-1614624532983-4ce03382d63d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2662&q=80"
-        alt="unsplash"></PostImage>
-
+      <PostImage url={data.image} alt="unsplash"></PostImage>
       <div className="post-overlay"></div>
       <div className="post-content">
         <div className="post-top">
-          <PostCategory>Kiến thức</PostCategory>
-          <PostMeta textColor="secondary"></PostMeta>
+          {category?.name && <PostCategory>{category.name}</PostCategory>}
+          <PostMeta authorName={data.author} textColor="secondary"></PostMeta>
         </div>
-        <PostTitle size="big">Hướng dẫn setup phòng cực chill dành cho người mới toàn tập</PostTitle>
+        <PostTitle size="big">{data.title || 'This is my title'}</PostTitle>
       </div>
     </PostFeatureItemStyles>
   )
