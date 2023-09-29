@@ -11,7 +11,7 @@ import { postStatus } from '@/utils/constants'
 import ImageUpload from '@/components/image/ImageUpload'
 import useFireBaseImage from '@/hooks/useFirebaseImage'
 import Toggle from '@/components/toggle/Toggle'
-import { addDoc, collection, getDocs, query, where } from 'firebase/firestore'
+import { addDoc, collection, getDocs, query, serverTimestamp, where } from 'firebase/firestore'
 import { db } from '@/firebase/firebase-config'
 import { Dropdown } from '@/components/dropdown'
 import { useAuth } from '@/contexts/auth-context'
@@ -46,7 +46,8 @@ const PostAddNew = () => {
     await addDoc(colRef, {
       ...cloneValues,
       image,
-      userId: userInfo.uid
+      userId: userInfo.uid,
+      createdAt: serverTimestamp,
     })
     toast.success('Create a new post succesfully!!!')
     reset({
@@ -88,7 +89,6 @@ const PostAddNew = () => {
     if (inputString.length === 0) {
       return inputString
     }
-
     // Chuyển chữ cái đầu tiên thành chữ hoa và nối với phần còn lại của chuỗi
     return inputString.charAt(0).toUpperCase() + inputString.slice(1)
   }

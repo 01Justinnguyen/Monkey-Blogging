@@ -46,8 +46,9 @@ const PostFeatureItemStyles = styled.div`
 `
 const PostFeatureItem = (props) => {
   const { data } = props
-  console.log('🐻 ~ file: PostFeatureItem.jsx:49 ~ PostFeatureItem ~ data:', data)
   const [category, setCategory] = useState('')
+  const [user, setUser] = useState('')
+
   useEffect(() => {
     async function fetchData() {
       const docRef = doc(db, 'categories', data.categoryId)
@@ -56,6 +57,21 @@ const PostFeatureItem = (props) => {
     }
     fetchData()
   }, [data.categoryId])
+
+  useEffect(() => {
+    async function fetchUser() {
+      if (data.userId) {
+        const docRef = doc(db, 'users', data.userId)
+        const docSnap = await getDoc(docRef)
+        if (docSnap.data) {
+          setUser(docSnap.data())
+        }
+      }
+    }
+    fetchUser()
+  }, [data.userId])
+
+  console.log('🐻 ~ file: PostFeatureItem.jsx:52 ~ PostFeatureItem ~ user:', user)
   if (!data || !data.id) return null
   return (
     <PostFeatureItemStyles>
@@ -64,7 +80,7 @@ const PostFeatureItem = (props) => {
       <div className="post-content">
         <div className="post-top">
           {category?.name && <PostCategory>{category.name}</PostCategory>}
-          <PostMeta authorName={data.author} textColor="secondary"></PostMeta>
+          <PostMeta authorName={user?.fullname} textColor="secondary"></PostMeta>
         </div>
         <PostTitle size="big">{data.title || 'This is my title'}</PostTitle>
       </div>

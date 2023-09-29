@@ -75,7 +75,7 @@ const Header = () => {
     <HeaderStyles>
       <div className="container">
         <div className="header-main">
-          <NavLink to={'/'}>
+          <NavLink to="/">
             <img srcSet="logo.png 2x" alt="monkey blogging" className="logo" />
           </NavLink>
           <ul className="menu">

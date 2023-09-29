@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Label } from '@/components/label'
 import { Input } from '@/components/input'
-import { IconEyeClose, IconEyeOpen } from '@/components/icon'
 import { Field } from '@/components/field'
 import { Button } from '@/components/button'
 import * as yup from 'yup'
@@ -11,9 +10,10 @@ import { toast } from 'react-toastify'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { auth, db } from '@/firebase/firebase-config'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { addDoc, collection } from 'firebase/firestore'
+import { addDoc, collection, doc, setDoc } from 'firebase/firestore'
 import AuthenticationPage from './AuthenticationPage'
 import InputPasswordToggle from '@/components/input/InputPasswordToggle'
+import slugify from 'slugify'
 
 const schema = yup.object({
   fullname: yup.string().required('Please enter your fullname'),
@@ -47,17 +47,25 @@ const SignUpPage = () => {
       displayName: values.fullname
     })
     const colRef = collection(db, 'users')
-    await addDoc(colRef, {
+
+    await setDoc(doc(db, 'users', auth.currentUser.uid), {
       fullname: values.fullname,
       email: values.email,
-      password: values.password
+      password: values.password,
+      username: slugify(values.fullname, { lower: true })
     })
+
+    // await addDoc(colRef, {
+    //   fullname: values.fullname,
+    //   email: values.email,
+    //   password: values.password
+    // })
     toast.success('Register successfully!!!')
     navigate('/sign-in')
   }
 
-  const [togglePassword, setTogglePassword] = useState(false)
-  const [toggleRePassword, setToggleRePassword] = useState(false)
+  // const [togglePassword, setTogglePassword] = useState(false)
+  // const [toggleRePassword, setToggleRePassword] = useState(false)
 
   useEffect(() => {
     const arrErrors = Object.values(errors)
