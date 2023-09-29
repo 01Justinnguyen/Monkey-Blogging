@@ -22,7 +22,6 @@ const HomeFeature = () => {
       setPosts(results)
     })
   }, [])
-  console.log('🐻 ~ file: HomeFeature.jsx:10 ~ HomeFeature ~ posts:', posts)
 
   return (
     <HomeFeatureStyles className="home-block">
