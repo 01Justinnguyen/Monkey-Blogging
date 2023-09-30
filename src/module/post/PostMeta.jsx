@@ -1,6 +1,7 @@
 import {} from 'react'
 import styled, { css } from 'styled-components'
 import PropTypes from 'prop-types'
+import { NavLink } from 'react-router-dom'
 
 const PostMetaStyles = styled.div`
   display: flex;
@@ -31,12 +32,14 @@ const PostMetaStyles = styled.div`
   }
 `
 
-const PostMeta = ({ date = 'Mar 23', authorName = 'Andiez Le', textColor = 'primary' }) => {
+const PostMeta = ({ date = 'Mar 23', authorName = 'Andiez Le', textColor = 'primary', to = '/' }) => {
   return (
     <PostMetaStyles textColor={textColor}>
       <span className="post-time">{date}</span>
       <span className="post-dot"></span>
-      <span className="post-author">{authorName}</span>
+      <NavLink to={to}>
+        <span className="post-author">{authorName}</span>
+      </NavLink>
     </PostMetaStyles>
   )
 }
@@ -46,7 +49,8 @@ PostMeta.propTypes = {
   textColor: PropTypes.oneOf(['priamary', 'secondary']),
   className: PropTypes.string,
   date: PropTypes.string,
-  authorName: PropTypes.string
+  authorName: PropTypes.string,
+  to: PropTypes.any
 }
 
 export default PostMeta
