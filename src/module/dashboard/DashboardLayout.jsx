@@ -17,8 +17,8 @@ const DashboardStyles = styled.div`
     }
     &-heading {
       font-weight: bold;
-      font-size: 25px;
-      margin-bottom: 10px;
+      font-size: 35px;
+      margin-bottom: 20px;
       color: ${(props) => props.theme.primary};
     }
   }

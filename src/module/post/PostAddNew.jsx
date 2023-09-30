@@ -30,53 +30,66 @@ const PostAddNew = () => {
       hot: false
     }
   })
-  const { image, progress, handleSelectImage, handleDeleteImage } = useFireBaseImage(setValue, getValues)
+  const { image, handleResetUpload, progress, handleSelectImage, handleDeleteImage } = useFireBaseImage(setValue, getValues)
   const [categories, setCategories] = useState([])
   const [selectCategory, setSelectCategory] = useState({})
+  const [loading, setLoading] = useState(false)
   const watchStatus = watch('status')
   const watchHot = watch('hot')
   // eslint-disable-next-line no-unused-vars
   // const watchCategory = watch('category')
 
   const addPostHandler = async (values) => {
-    const cloneValues = { ...values }
-    cloneValues.slug = slugify(values.slug || values.title, { lower: true })
-    cloneValues.status = Number(values.status)
-    const colRef = collection(db, 'posts')
-    await addDoc(colRef, {
-      ...cloneValues,
-      image,
-      userId: userInfo.uid,
-      createdAt: serverTimestamp,
-    })
-    toast.success('Create a new post succesfully!!!')
-    reset({
-      title: '',
-      slug: '',
-      status: 2,
-      categoryId: '',
-      hot: false,
-      image: ''
-    })
-    setSelectCategory({})
+    setLoading(true)
+    try {
+      const cloneValues = { ...values }
+      cloneValues.slug = slugify(values.slug || values.title, { lower: true })
+      cloneValues.status = Number(values.status)
+      const colRef = collection(db, 'posts')
+      await addDoc(colRef, {
+        ...cloneValues,
+        image,
+        userId: userInfo.uid,
+        createdAt: serverTimestamp()
+      })
+      toast.success('Create a new post succesfully!!!')
+      reset({
+        title: '',
+        slug: '',
+        status: 2,
+        categoryId: '',
+        hot: false,
+        image: ''
+      })
+      handleResetUpload()
+      setSelectCategory({})
+    } catch (error) {
+      setLoading(false)
+    } finally {
+      setLoading(false)
+    }
   }
 
   //handle get categories
   useEffect(() => {
-    async function getCategories() {
-      const colRef = collection(db, 'categories')
-      const q = query(colRef, where('status', '==', 1))
-      const querySnapshot = await getDocs(q)
-      let listCategories = []
-      querySnapshot.forEach((doc) => {
-        listCategories.push({
-          id: doc.id,
-          ...doc.data()
+    try {
+      const getCategories = async () => {
+        const colRef = collection(db, 'categories')
+        const q = query(colRef, where('status', '==', 1))
+        const querySnapshot = await getDocs(q)
+        let listCategories = []
+        querySnapshot.forEach((doc) => {
+          listCategories.push({
+            id: doc.id,
+            ...doc.data()
+          })
         })
-      })
-      setCategories(listCategories)
+        setCategories(listCategories)
+      }
+      getCategories()
+    } catch (error) {
+      console.log('🐻 ~ file: PostAddNew.jsx:77 ~ useEffect ~ error:', error)
     }
-    getCategories()
   }, [])
 
   const handleClickOption = (category) => {
@@ -92,6 +105,10 @@ const PostAddNew = () => {
     // Chuyển chữ cái đầu tiên thành chữ hoa và nối với phần còn lại của chuỗi
     return inputString.charAt(0).toUpperCase() + inputString.slice(1)
   }
+
+  useEffect(() => {
+    document.title = 'Monkey Blogging - Add New Post'
+  }, [])
 
   return (
     <PostAddNewStyles>
@@ -152,7 +169,7 @@ const PostAddNew = () => {
             <Toggle on={watchHot === true} onClick={() => setValue('hot', !watchHot)} />
           </Field>
         </div>
-        <Button kind="primary" type="submit" className="mx-auto">
+        <Button className="mx-auto w-[250px]" kind="primary" type="submit" isloading={loading} disabled={loading}>
           Add new post
         </Button>
       </form>

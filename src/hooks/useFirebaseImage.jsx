@@ -63,11 +63,18 @@ const useFireBaseImage = (setValue, getValues) => {
         console.log('Errors: ', error)
       })
   }
+
+  const handleResetUpload = () => {
+    setImage('')
+    setProgress(0)
+  }
+
   return {
     image,
     progress,
     handleSelectImage,
-    handleDeleteImage
+    handleDeleteImage,
+    handleResetUpload
   }
 }
 

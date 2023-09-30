@@ -1,6 +1,7 @@
 import { db } from '@/firebase/firebase-config'
 import { doc, getDoc } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
+import slugify from 'slugify'
 import styled from 'styled-components'
 import PostCategory from './PostCategory'
 import PostImage from './PostImage'
@@ -70,8 +71,6 @@ const PostFeatureItem = (props) => {
     }
     fetchUser()
   }, [data.userId])
-
-  console.log('🐻 ~ file: PostFeatureItem.jsx:52 ~ PostFeatureItem ~ user:', user)
   if (!data || !data.id) return null
   return (
     <PostFeatureItemStyles>
@@ -79,10 +78,12 @@ const PostFeatureItem = (props) => {
       <div className="post-overlay"></div>
       <div className="post-content">
         <div className="post-top">
-          {category?.name && <PostCategory>{category.name}</PostCategory>}
-          <PostMeta authorName={user?.fullname} textColor="secondary"></PostMeta>
+          {category?.name && <PostCategory to={category?.slug}>{category.name}</PostCategory>}
+          <PostMeta to={slugify(user?.fullname || '', { lower: true })} authorName={user?.fullname} textColor="secondary"></PostMeta>
         </div>
-        <PostTitle size="big">{data.title || 'This is my title'}</PostTitle>
+        <PostTitle to={data.slug} size="big">
+          {data.title || 'This is my title'}
+        </PostTitle>
       </div>
     </PostFeatureItemStyles>
   )
