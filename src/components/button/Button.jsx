@@ -14,25 +14,31 @@ const ButtonStyles = styled.button`
   justify-content: center;
   align-items: center;
   height: ${(props) => props.height || '66px'};
-  &:disabled {
-    opacity: 0.5;
-    pointer-events: none;
-  }
   ${(props) =>
     props.kind === 'secondary' &&
     css`
-      background-color: white;
       color: ${(props) => props.theme.primary};
+      background-color: white;
     `};
   ${(props) =>
     props.kind === 'primary' &&
     css`
       color: white;
-      background-image: linear-gradient(to right bottom, ${(props) => props.theme.primary}, ${(props) => props.theme.secondary});
+      background-color: ${(props) => props.theme.primary};
     `};
+  ${(props) =>
+    props.kind === 'ghost' &&
+    css`
+      color: ${(props) => props.theme.primary};
+      background-color: rgba(29, 192, 113, 0.1);
+    `};
+  &:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 `
 
-const Button = ({ type = 'button', onClick = () => {}, kind = 'secondary', children, ...props }) => {
+const Button = ({ type = 'button', onClick = () => {}, kind = 'primary', children, ...props }) => {
   const { isloading, to } = props
   const child = !!isloading ? <LoadingSpinner /> : children
   if (to !== '' && typeof to === 'string') {

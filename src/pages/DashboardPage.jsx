@@ -1,9 +1,10 @@
-import React from 'react'
+import DashboardHeading from '@/module/dashboard/DashboardHeading'
+import {} from 'react'
 
 const DashboardPage = () => {
   return (
     <div>
-      <h1>Dashboard page</h1>
+      <DashboardHeading title="Dashboard page" desc="Manage your dashboard"></DashboardHeading>
     </div>
   )
 }

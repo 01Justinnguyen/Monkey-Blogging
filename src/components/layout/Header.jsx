@@ -24,6 +24,11 @@ const HeaderStyles = styled.header`
     align-items: center;
     justify-content: space-between;
   }
+  .header-auth {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
   .logo {
     display: block;
     max-width: 50px;
@@ -99,13 +104,14 @@ const Header = () => {
           </div>
 
           {!userInfo ? (
-            <Button type="button" to="/sign-up" height="56px" className="header-button">
-              Sign Up
+            <Button kind="primary" type="button" height="56px" className="header-button" to="/sign-in">
+              Login
             </Button>
           ) : (
             <div className="header-auth">
-              <strong>Welcome back, </strong>
-              <strong className="text-primary">{getName(userInfo?.displayName)}</strong>
+              <Button kind="primary" type="button" height="56px" className="header-button" to="/dashboard">
+                Dashboard
+              </Button>
             </div>
           )}
         </div>

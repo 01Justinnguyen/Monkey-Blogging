@@ -16,6 +16,7 @@ import { db } from '@/firebase/firebase-config'
 import { Dropdown } from '@/components/dropdown'
 import { useAuth } from '@/contexts/auth-context'
 import { toast } from 'react-toastify'
+import DashboardHeading from '../dashboard/DashboardHeading'
 const PostAddNewStyles = styled.div``
 const PostAddNew = () => {
   const { userInfo } = useAuth()
@@ -112,7 +113,7 @@ const PostAddNew = () => {
 
   return (
     <PostAddNewStyles>
-      <h1 className="dashboard-heading">Add new post</h1>
+      <DashboardHeading title="Add new post" className="dashboard-heading"></DashboardHeading>
       <form onSubmit={handleSubmit(addPostHandler)}>
         <div className="grid grid-cols-2 mb-10 gap-x-10">
           <Field>
