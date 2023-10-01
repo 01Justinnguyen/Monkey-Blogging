@@ -1,12 +1,12 @@
-import { db } from '@/firebase/firebase-config'
-import { doc, getDoc } from 'firebase/firestore'
-import { useEffect, useState } from 'react'
-import slugify from 'slugify'
 import styled from 'styled-components'
-import PostCategory from './PostCategory'
-import PostImage from './PostImage'
-import PostMeta from './PostMeta'
+import slugify from 'slugify'
 import PostTitle from './PostTitle'
+import PostMeta from './PostMeta'
+import PostImage from './PostImage'
+import PostCategory from './PostCategory'
+import { useEffect, useState } from 'react'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '@/firebase/firebase-config'
 const PostFeatureItemStyles = styled.div`
   width: 100%;
   border-radius: 16px;
@@ -72,6 +72,20 @@ const PostFeatureItem = (props) => {
     fetchUser()
   }, [data.userId])
   if (!data || !data.id) return null
+  const date = data?.createdAt?.seconds ? new Date(data?.createdAt?.seconds * 1000) : new Date()
+  const formatDate = new Date(date)
+    .toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    })
+    .split(' ')
+    .join('-')
+
+  function getMainName(name) {
+    return name?.split(' ').slice(-1).join(' ')
+  }
+
   return (
     <PostFeatureItemStyles>
       <PostImage url={data.image} alt="unsplash"></PostImage>
@@ -79,7 +93,7 @@ const PostFeatureItem = (props) => {
       <div className="post-content">
         <div className="post-top">
           {category?.name && <PostCategory to={category?.slug}>{category.name}</PostCategory>}
-          <PostMeta to={slugify(user?.fullname || '', { lower: true })} authorName={user?.fullname} textColor="secondary"></PostMeta>
+          <PostMeta to={slugify(user?.fullname || '', { lower: true })} authorName={getMainName(user?.fullname)} textColor="secondary" date={formatDate}></PostMeta>
         </div>
         <PostTitle to={data.slug} size="big">
           {data.title || 'This is my title'}
