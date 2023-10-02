@@ -16,9 +16,9 @@
 # Category
 
 - id
-- title
+- name
 - slug
-- status: 1(approved) 2(pending)
+- status: 1(approved) 2(unapproved)
 - createdAt
 
 # User

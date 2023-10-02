@@ -1,6 +1,6 @@
 import { Button } from '@/components/button'
 import { Radio } from '@/components/checkbox'
-import { Field } from '@/components/field'
+import { Field, FieldCheckboxes } from '@/components/field'
 import { Input } from '@/components/input'
 import { Label } from '@/components/label'
 import DashboardHeading from '../dashboard/DashboardHeading'
@@ -11,14 +11,26 @@ const CategoryAddNew = () => {
   const {
     control,
     setValue,
-    formState: { errors, isSubmitting, isValid }
+    formState: { errors, isSubmitting, isValid },
+    handleSubmit
   } = useForm({
-    mode: 'onChange'
+    mode: 'onChange',
+    defaultValues: {
+      name: '',
+      slug: '',
+      status: 1,
+      createdAt: new Date()
+    }
   })
+
+  const handleAddNewCategory = (values) => {
+    console.log('🐻 ~ file: CategoryAddNew.jsx:27 ~ handleAddNewCategory ~ values:', values)
+  }
+
   return (
     <div>
       <DashboardHeading title="New category" desc="Add new category"></DashboardHeading>
-      <form>
+      <form onSubmit={handleSubmit(handleAddNewCategory)}>
         <div className="form-layout">
           <Field>
             <Label>Name</Label>
@@ -32,17 +44,17 @@ const CategoryAddNew = () => {
         <div className="form-layout">
           <Field>
             <Label>Status</Label>
-            <div className="flex flex-wrap gap-x-5">
+            <FieldCheckboxes>
               <Radio name="status" control={control} checked={true}>
                 Approved
               </Radio>
               <Radio name="status" control={control}>
                 Unapproved
               </Radio>
-            </div>
+            </FieldCheckboxes>
           </Field>
         </div>
-        <Button kind="primary" className="mx-auto">
+        <Button kind="primary" className="mx-auto" type="submit">
           Add new category
         </Button>
       </form>
