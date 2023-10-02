@@ -3,16 +3,23 @@ import { Radio } from '@/components/checkbox'
 import { Field, FieldCheckboxes } from '@/components/field'
 import { Input } from '@/components/input'
 import { Label } from '@/components/label'
+import { categoryStatus } from '@/utils/constants'
 import DashboardHeading from '../dashboard/DashboardHeading'
-import {} from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import slugify from 'slugify'
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { db } from '@/firebase/firebase-config'
+import { toast } from 'react-toastify'
 
 const CategoryAddNew = () => {
   const {
     control,
     setValue,
     formState: { errors, isSubmitting, isValid },
-    handleSubmit
+    handleSubmit,
+    watch,
+    reset
   } = useForm({
     mode: 'onChange',
     defaultValues: {
@@ -23,9 +30,31 @@ const CategoryAddNew = () => {
     }
   })
 
-  const handleAddNewCategory = (values) => {
-    console.log('🐻 ~ file: CategoryAddNew.jsx:27 ~ handleAddNewCategory ~ values:', values)
+  const handleAddNewCategory = async (values) => {
+    if (!isValid) return
+    const newValues = { ...values }
+    newValues.slug = slugify(newValues.slug || newValues.name, { lower: true })
+    newValues.status = Number(newValues.status)
+    const colRef = collection(db, 'categories')
+    try {
+      await addDoc(colRef, {
+        ...newValues,
+        createdAt: serverTimestamp()
+      })
+      toast.success('Created category successfully')
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      reset({
+        name: '',
+        slug: '',
+        status: 1,
+        createdAt: new Date()
+      })
+    }
   }
+
+  const watchStatus = watch('status')
 
   return (
     <div>
@@ -34,7 +63,7 @@ const CategoryAddNew = () => {
         <div className="form-layout">
           <Field>
             <Label>Name</Label>
-            <Input control={control} name="name" placeholder="Enter your category name"></Input>
+            <Input control={control} name="name" placeholder="Enter your category name" required></Input>
           </Field>
           <Field>
             <Label>Slug</Label>
@@ -45,16 +74,16 @@ const CategoryAddNew = () => {
           <Field>
             <Label>Status</Label>
             <FieldCheckboxes>
-              <Radio name="status" control={control} checked={true}>
+              <Radio name="status" control={control} checked={Number(watchStatus) === categoryStatus.APPROVED} value={categoryStatus.APPROVED}>
                 Approved
               </Radio>
-              <Radio name="status" control={control}>
+              <Radio name="status" control={control} checked={Number(watchStatus) === categoryStatus.UNAPPROVED} value={categoryStatus.UNAPPROVED}>
                 Unapproved
               </Radio>
             </FieldCheckboxes>
           </Field>
         </div>
-        <Button kind="primary" className="mx-auto" type="submit">
+        <Button kind="primary" className="mx-auto w-[250px]" type="submit" isloading={isSubmitting} disabled={isSubmitting}>
           Add new category
         </Button>
       </form>
