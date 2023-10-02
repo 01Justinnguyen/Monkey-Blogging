@@ -61,7 +61,7 @@ const Button = ({ type = 'button', onClick = () => {}, kind = 'primary', childre
 
 Button.propTypes = {
   type: PropTypes.oneOf(['button', 'submit']),
-  kind: PropTypes.oneOf(['primary', 'secondary']),
+  kind: PropTypes.oneOf(['primary', 'secondary', 'ghost']),
   onClick: PropTypes.func,
   children: PropTypes.node,
   isloading: PropTypes.bool,
