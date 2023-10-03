@@ -8,8 +8,10 @@ import { collection, deleteDoc, doc, getDoc, onSnapshot } from 'firebase/firesto
 import { useEffect, useState } from 'react'
 import DashboardHeading from '../dashboard/DashboardHeading'
 import Swal from 'sweetalert2'
+import { useNavigate } from 'react-router-dom'
 
 const CategoryManage = () => {
+  const navigate = useNavigate()
   const [categoryList, setCategoryList] = useState([])
 
   useEffect(() => {
@@ -76,7 +78,7 @@ const CategoryManage = () => {
                 <td>
                   <div className="flex items-center gap-x-3">
                     <ActionView></ActionView>
-                    <ActionEdit></ActionEdit>
+                    <ActionEdit onClick={() => navigate(`/manage/update-category?id=${category.id}`)}></ActionEdit>
                     <ActionDelete onClick={() => hanleDeleteCategory(category.id)}></ActionDelete>
                   </div>
                 </td>
