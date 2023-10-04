@@ -4,19 +4,34 @@ import { LabelStatus } from '@/components/label'
 import { Table } from '@/components/table'
 import { db } from '@/firebase/firebase-config'
 import { categoryStatus } from '@/utils/constants'
-import { collection, deleteDoc, doc, getDoc, onSnapshot } from 'firebase/firestore'
+import { collection, deleteDoc, doc, endAt, getDoc, onSnapshot, or, orderBy, query, startAt, where } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
 import DashboardHeading from '../dashboard/DashboardHeading'
 import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router-dom'
+import { debounce } from 'lodash'
 
 const CategoryManage = () => {
   const navigate = useNavigate()
   const [categoryList, setCategoryList] = useState([])
+  const [queryValue, setQueryValue] = useState('')
 
   useEffect(() => {
     const colRef = collection(db, 'categories')
-    onSnapshot(colRef, (snapshot) => {
+    // const colRef = db.collection('categories')
+    // const newRef = queryValue ? query(colRef, where('name', '==', queryValue)) : colRef
+
+    // const fuzzySearch = (query, colRef) => {
+    //   return ;
+    // }
+
+    // const newRef2 = queryValue ? query(colRef, orderBy('name'), startAt(queryValue), endAt(queryValue + '\uf8ff')) : colRef
+
+    const newRef3 = queryValue ? query(colRef, where('name', '>=', queryValue), where('name', '<=', queryValue + '\uf8ff')) : colRef
+
+    // const sortedRef = query(newRef3, orderBy('name'))
+
+    onSnapshot(newRef3, (snapshot) => {
       let results = []
       snapshot.forEach((doc) => {
         results.push({
@@ -26,7 +41,7 @@ const CategoryManage = () => {
       })
       setCategoryList(results)
     })
-  }, [])
+  }, [queryValue])
 
   const hanleDeleteCategory = async (docId) => {
     const colRef = doc(db, 'categories', docId)
@@ -46,6 +61,10 @@ const CategoryManage = () => {
     })
   }
 
+  const handleFilterChange = debounce((e) => {
+    setQueryValue(e.target.value)
+  }, 500)
+
   return (
     <div>
       <DashboardHeading title="Categories" desc="Manage your category">
@@ -53,6 +72,9 @@ const CategoryManage = () => {
           Create category
         </Button>
       </DashboardHeading>
+      <div className="flex items-center justify-end mb-10">
+        <input type="text" placeholder="Type anything..." className="px-5 py-4 border border-gray-300 rounded-lg" onChange={(e) => handleFilterChange(e)} />
+      </div>
       <Table>
         <thead>
           <tr>
