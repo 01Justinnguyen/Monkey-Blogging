@@ -73,7 +73,9 @@ const CategoryManage = () => {
                   <span className="italic text-gray-400">{category.slug}</span>
                 </td>
                 <td>
-                  <LabelStatus type={category.status === categoryStatus.APPROVED ? 'success' : 'warning'}>{category.status === categoryStatus.APPROVED ? 'Approved' : 'Unapproved'}</LabelStatus>
+                  <LabelStatus type={Number(category.status) === categoryStatus.APPROVED ? 'success' : 'warning'}>
+                    {Number(category.status) === categoryStatus.APPROVED ? 'Approved' : 'Unapproved'}
+                  </LabelStatus>
                 </td>
                 <td>
                   <div className="flex items-center gap-x-3">
