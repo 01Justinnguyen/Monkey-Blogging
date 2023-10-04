@@ -3,43 +3,64 @@ import { Radio } from '@/components/checkbox'
 import { Field, FieldCheckboxes } from '@/components/field'
 import { Label } from '@/components/label'
 import { Input } from '@/components/input'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import DashboardHeading from '../dashboard/DashboardHeading'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { db } from '@/firebase/firebase-config'
+import { categoryStatus } from '@/utils/constants'
+import slugify from 'slugify'
+import { toast } from 'react-toastify'
 
 const CategoryUpdate = () => {
-  const [category, setCategory] = useState({})
-  const { control } = useForm({
+  const {
+    control,
+    reset,
+    watch,
+    handleSubmit,
+    formState: { isSubmitting }
+  } = useForm({
     mode: 'onChange',
     defaultValues: {}
   })
   const [params] = useSearchParams()
-  const cateId = params.get('id')
-  // setCategoryId()
+  const categoryId = params.get('id')
+  const navigate = useNavigate()
 
   useEffect(() => {
     async function getCategoryById() {
-      const docRef = doc(db, 'categories', params.get('id'))
+      const docRef = doc(db, 'categories', categoryId)
       const docSnap = await getDoc(docRef)
       if (docSnap.exists()) {
-        setCategory(docSnap.data())
+        reset(docSnap.data())
       } else {
         console.log('No such document!')
       }
     }
     getCategoryById()
-  }, [params])
+  }, [categoryId, reset])
+  const watchStatus = watch('status')
 
-  console.log('🐻 ~ file: CategoryUpdate.jsx:15 ~ CategoryUpdate ~ category:', category)
+  const handleUpdateCategory = async (values) => {
+    const docRef = doc(db, 'categories', categoryId)
 
-  if (!cateId) return null
+    await updateDoc(docRef, {
+      name: values.name,
+      slug: slugify(values.slug || values.name, { lower: true }),
+      status: Number(values.status)
+    })
+    toast.success('Update category successfully!!!')
+    setTimeout(() => {
+      navigate('/manage/category')
+    }, 1000)
+  }
+
+  if (!categoryId) return null
   return (
     <div>
-      <DashboardHeading title="Update category" desc={`Update your category: ${cateId}`}></DashboardHeading>
-      <form>
+      <DashboardHeading title="Update category" desc={`Update your category: ${categoryId}`}></DashboardHeading>
+      <form onSubmit={handleSubmit(handleUpdateCategory)}>
         <div className="form-layout">
           <Field>
             <Label>Name</Label>
@@ -54,16 +75,16 @@ const CategoryUpdate = () => {
           <Field>
             <Label>Status</Label>
             <FieldCheckboxes>
-              <Radio name="status" control={control} checked={true}>
+              <Radio name="status" control={control} checked={Number(watchStatus) === categoryStatus.APPROVED} value={categoryStatus.APPROVED}>
                 Approved
               </Radio>
-              <Radio name="status" control={control}>
+              <Radio name="status" control={control} checked={Number(watchStatus) === categoryStatus.UNAPPROVED} value={categoryStatus.UNAPPROVED}>
                 Unapproved
               </Radio>
             </FieldCheckboxes>
           </Field>
         </div>
-        <Button kind="primary" className="mx-auto w-[250px]" type="submit">
+        <Button kind="primary" className="mx-auto w-[250px]" type="submit" isloading={isSubmitting} disabled={isSubmitting}>
           Update category
         </Button>
       </form>
