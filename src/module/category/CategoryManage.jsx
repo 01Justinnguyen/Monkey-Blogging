@@ -3,61 +3,32 @@ import { Button } from '@/components/button'
 import { LabelStatus } from '@/components/label'
 import { Table } from '@/components/table'
 import { db } from '@/firebase/firebase-config'
-import { categoryStatus } from '@/utils/constants'
+import { categoryStatus, ITEM_PER_PAGE } from '@/utils/constants'
 import { collection, deleteDoc, doc, endAt, getCountFromServer, getDoc, getDocs, limit, onSnapshot, or, orderBy, query, startAfter, startAt, where } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
 import DashboardHeading from '../dashboard/DashboardHeading'
 import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router-dom'
 import { debounce } from 'lodash'
-import ReactPaginate from 'react-paginate'
-import { async } from '@firebase/util'
-
-const itemsPerPage = 5
 
 const CategoryManage = () => {
   const navigate = useNavigate()
   const [categoryList, setCategoryList] = useState([])
   const [queryValue, setQueryValue] = useState('')
-  // const [totalItems, setTotalItems] = useState(0)
+  const [lastDoc, setLastDoc] = useState()
+  const [totalDocument, setTotalDocument] = useState(0)
 
-  useEffect(() => {
-    const colRef = collection(db, 'categories')
+  const handleLoadMoreCategory = async () => {
+    // Query the first page of docs
+    // const first = query(collection(db, 'categories'), limit(ITEM_PER_PAGE))
 
-    async function test() {
-      const first = query(colRef, orderBy('name'), limit(10))
-      const documentSnapshots = await getDocs(first)
+    // console.log('last', lastVisible)
 
-      // Get the last visible document
-      const lastVisible = documentSnapshots.docs[documentSnapshots.docs.length - 1]
-      console.log('last', lastVisible.data())
+    // Construct a new query starting at this document,
+    // get the next 25 cities.
+    const nextRef = query(collection(db, 'categories'), startAfter(lastDoc), limit(ITEM_PER_PAGE))
 
-      const next = query(colRef, orderBy('name'), startAfter(lastVisible), limit(10))
-      console.log('🐻 ~ file: CategoryManage.jsx:36 ~ test ~ next:', next.firestore)
-    }
-
-    test()
-
-    // async function test() {
-    //   const colRef = collection(db, 'categories')
-    //   const snapshot = await getCountFromServer(colRef)
-    //   setTotalItems(snapshot.data().count)
-    // }
-    // test()
-
-    // const colRef = db.collection('categories')
-    // const newRef = queryValue ? query(colRef, where('name', '==', queryValue)) : colRef
-
-    // const fuzzySearch = (query, colRef) => {
-    //   return ;
-    // }
-
-    // const newRef2 = queryValue ? query(colRef, orderBy('name'), startAt(queryValue), endAt(queryValue + '\uf8ff')) : colRef
-
-    const newRef = queryValue ? query(colRef, where('name', '>=', queryValue), where('name', '<=', queryValue + 'utf8')) : colRef
-    // const sortedRef = query(newRef3, orderBy ('name'))
-
-    onSnapshot(newRef, (snapshot) => {
+    onSnapshot(nextRef, (snapshot) => {
       let results = []
       snapshot.forEach((doc) => {
         results.push({
@@ -65,10 +36,59 @@ const CategoryManage = () => {
           ...doc.data()
         })
       })
-      setCategoryList(results)
+      setCategoryList([...categoryList, ...results])
     })
+    const documentSnapshots = await getDocs(nextRef)
+
+    // Get the last visible document
+    const lastVisible = documentSnapshots.docs[documentSnapshots.docs.length - 1]
+    setLastDoc(lastVisible)
+  }
+
+  //handle search and initialValue
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const colRef = collection(db, 'categories')
+        const newRef = queryValue ? query(colRef, where('name', '>=', queryValue), where('name', '<=', queryValue + 'utf8')) : query(colRef, limit(ITEM_PER_PAGE))
+
+        const documentSnapshots = await getDocs(newRef)
+
+        // Get the last visible document
+        const lastVisible = documentSnapshots.docs[documentSnapshots.docs.length - 1]
+        setLastDoc(lastVisible)
+        // console.log('last', lastVisible)
+
+        // const snapshot = await getCountFromServer(colRef)
+
+        onSnapshot(colRef, (snapshot) => {
+          setTotalDocument(snapshot.size)
+        })
+
+        onSnapshot(newRef, (snapshot) => {
+          let results = []
+          snapshot.forEach((doc) => {
+            results.push({
+              id: doc.id,
+              ...doc.data()
+            })
+          })
+          setCategoryList(results)
+        })
+      } catch (error) {
+        console.log('Error: ', error)
+      }
+    }
+    fetchData()
   }, [queryValue])
 
+  const handleInputFilter = debounce((e) => {
+    setQueryValue(e.target.value)
+  }, 500)
+
+  //End handle search and initialValue
+
+  //handle delete category
   const hanleDeleteCategory = async (docId) => {
     const colRef = doc(db, 'categories', docId)
     Swal.fire({
@@ -87,27 +107,6 @@ const CategoryManage = () => {
     })
   }
 
-  const handleFilterChange = debounce((e) => {
-    setQueryValue(e.target.value)
-  }, 500)
-
-  // // Here we use item offsets; we could also use page offsets
-  // // following the API or data you're working with.
-  // const [itemOffset, setItemOffset] = useState(0)
-
-  // // Simulate fetching items from another resources.
-  // // (This could be items from props; or items loaded in a local state
-  // // from an API endpoint with useEffect and useState)
-  // const endOffset = itemOffset + itemsPerPage
-  // const pageCount = Math.ceil(totalItems / itemsPerPage)
-
-  // // Invoke when user click to request another page.
-  // const handlePageClick = (event) => {
-  //   const newOffset = (event.selected * itemsPerPage) % totalItems
-  //   console.log(`User requested page number ${event.selected + 1}, which is offset ${newOffset}`)
-  //   // setItemOffset(newOffset)
-  // }
-
   return (
     <div>
       <DashboardHeading title="Categories" desc="Manage your category">
@@ -116,7 +115,7 @@ const CategoryManage = () => {
         </Button>
       </DashboardHeading>
       <div className="flex items-center justify-end mb-10">
-        <input type="text" placeholder="Type anything..." className="px-5 py-4 border border-gray-300 rounded-lg" onChange={(e) => handleFilterChange(e)} />
+        <input onChange={handleInputFilter} type="text" placeholder="Type anything..." className="px-5 py-4 border border-gray-300 rounded-lg" />
       </div>
       <Table>
         <thead>
@@ -153,7 +152,13 @@ const CategoryManage = () => {
             ))}
         </tbody>
       </Table>
-      {/* <ReactPaginate breakLabel="..." nextLabel="next >" onPageChange={handlePageClick} pageRangeDisplayed={5} pageCount={pageCount} previousLabel="< previous" renderOnZeroPageCount={null} /> */}
+      {totalDocument > categoryList.length && (
+        <div className="mt-10">
+          <Button kind="primary" className="mx-auto w-[250px] flex items-center" onClick={handleLoadMoreCategory}>
+            Load More <span className="block mr-2 text-3xl">+</span>
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

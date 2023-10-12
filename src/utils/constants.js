@@ -26,3 +26,5 @@ export const categoryStatus = {
   UNAPPROVED: 2
   // REJECTED: 3
 }
+
+export const ITEM_PER_PAGE = 3
