@@ -59,7 +59,7 @@ const CategoryUpdate = () => {
   if (!categoryId) return null
   return (
     <div>
-      <DashboardHeading title="Update category" desc={`Update your category: ${categoryId}`}></DashboardHeading>
+      <DashboardHeading title="Update category"></DashboardHeading>
       <form onSubmit={handleSubmit(handleUpdateCategory)}>
         <div className="form-layout">
           <Field>

@@ -1,0 +1,7 @@
+import {} from 'react'
+
+const UserTable = () => {
+  return <div></div>
+}
+
+export default UserTable

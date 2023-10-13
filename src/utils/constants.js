@@ -27,4 +27,17 @@ export const categoryStatus = {
   // REJECTED: 3
 }
 
+export const userStatus = {
+  ACTIVE: 1,
+  PENDING: 2,
+  BANNED: 3
+}
+
+export const userRoles = {
+  ADMIN: 1,
+  MODERATOR: 2,
+  EDITOR: 3,
+  USER: 4
+}
+
 export const ITEM_PER_PAGE = 3
