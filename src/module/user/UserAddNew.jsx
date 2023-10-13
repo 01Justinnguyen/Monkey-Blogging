@@ -6,15 +6,67 @@ import { Label } from '@/components/label'
 import DashboardHeading from '../dashboard/DashboardHeading'
 import {} from 'react'
 import { useForm } from 'react-hook-form'
+import { userStatus, userRoles } from '@/utils/constants'
+import { db } from '@/firebase/firebase-config'
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { toast } from 'react-toastify'
+import InputPasswordToggle from '@/components/input/InputPasswordToggle'
 
 const UserAddNew = () => {
-  const { control } = useForm({
-    mode: 'onChange'
+  const {
+    control,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors, isSubmitting, isValid }
+  } = useForm({
+    mode: 'onChange',
+    defaultValues: {
+      fullname: '',
+      username: '',
+      email: '',
+      password: '',
+      status: 1,
+      role: 1
+    }
   })
+
+  const handleAddNewUser = async (values) => {
+    console.log('🐻 ~ file: UserAddNew.jsx:24 ~ handleAddNewUser ~ values:', values)
+    if (!isValid) return
+
+    //clone array
+    const newValues = { ...values }
+    newValues.status = Number(newValues.status)
+    newValues.role = Number(newValues.role)
+    const colRef = collection(db, 'users')
+
+    try {
+      await addDoc(colRef, {
+        ...newValues,
+        createdAt: serverTimestamp()
+      })
+      toast.success('Created category successfully')
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      reset({
+        fullname: '',
+        username: '',
+        email: '',
+        password: '',
+        status: 1,
+        role: 1
+      })
+    }
+  }
+
+  const watchStatus = watch('status')
+  const watchRoles = watch('role')
   return (
     <div>
       <DashboardHeading title="New user" desc="Add new user to system"></DashboardHeading>
-      <form>
+      <form onSubmit={handleSubmit(handleAddNewUser)}>
         <div className="form-layout">
           <Field>
             <Label>Fullname</Label>
@@ -32,20 +84,20 @@ const UserAddNew = () => {
           </Field>
           <Field>
             <Label>Password</Label>
-            <Input name="password" placeholder="Enter your password" control={control} type="password"></Input>
+            <InputPasswordToggle unLabel={true} name="password" placeholder="Enter your password" control={control} type="password"></InputPasswordToggle>
           </Field>
         </div>
         <div className="form-layout">
           <Field>
             <Label>Status</Label>
             <FieldCheckboxes>
-              <Radio name="status" control={control}>
+              <Radio checked={Number(watchStatus) === userStatus.ACTIVE} value={userStatus.ACTIVE} name="status" control={control}>
                 Active
               </Radio>
-              <Radio name="status" control={control}>
+              <Radio checked={Number(watchStatus) === userStatus.PENDING} value={userStatus.PENDING} name="status" control={control}>
                 Pending
               </Radio>
-              <Radio name="status" control={control}>
+              <Radio checked={Number(watchStatus) === userStatus.BANNED} value={userStatus.BANNED} name="status" control={control}>
                 Banned
               </Radio>
             </FieldCheckboxes>
@@ -53,22 +105,22 @@ const UserAddNew = () => {
           <Field>
             <Label>Role</Label>
             <FieldCheckboxes>
-              <Radio name="role" control={control}>
+              <Radio checked={Number(watchRoles) === userRoles.ADMIN} value={userRoles.ADMIN} name="role" control={control}>
                 Admin
               </Radio>
-              <Radio name="role" control={control}>
+              <Radio checked={Number(watchRoles) === userRoles.MODERATOR} value={userRoles.MODERATOR} name="role" control={control}>
                 Moderator
               </Radio>
-              <Radio name="role" control={control}>
+              <Radio checked={Number(watchRoles) === userRoles.EDITOR} value={userRoles.EDITOR} name="role" control={control}>
                 Editor
               </Radio>
-              <Radio name="role" control={control}>
+              <Radio checked={Number(watchRoles) === userRoles.USER} value={userRoles.USER} name="role" control={control}>
                 User
               </Radio>
             </FieldCheckboxes>
           </Field>
         </div>
-        <Button kind="primary" className="mx-auto w-[200px]">
+        <Button type="submit" kind="primary" className="mx-auto w-[200px]" isloading={isSubmitting} disabled={isSubmitting}>
           Add new user
         </Button>
       </form>

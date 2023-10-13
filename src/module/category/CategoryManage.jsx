@@ -89,7 +89,7 @@ const CategoryManage = () => {
   //End handle search and initialValue
 
   //handle delete category
-  const hanleDeleteCategory = async (docId) => {
+  const handleDeleteCategory = async (docId) => {
     const colRef = doc(db, 'categories', docId)
     Swal.fire({
       title: 'Are you sure?',
@@ -131,7 +131,7 @@ const CategoryManage = () => {
           {categoryList.length > 0 &&
             categoryList.map((category) => (
               <tr key={category.id}>
-                <td>{category.id}</td>
+                <td title={category.id}>{category.id.slice(0, 5) + '…'}</td>
                 <td>{category.name}</td>
                 <td>
                   <span className="italic text-gray-400">{category.slug}</span>
@@ -145,7 +145,7 @@ const CategoryManage = () => {
                   <div className="flex items-center gap-x-3">
                     <ActionView></ActionView>
                     <ActionEdit onClick={() => navigate(`/manage/update-category?id=${category.id}`)}></ActionEdit>
-                    <ActionDelete onClick={() => hanleDeleteCategory(category.id)}></ActionDelete>
+                    <ActionDelete onClick={() => handleDeleteCategory(category.id)}></ActionDelete>
                   </div>
                 </td>
               </tr>
