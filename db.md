@@ -24,7 +24,7 @@
 # User
 
 - id
-- displayName
+- userName
 - email
 - password
 - avatar

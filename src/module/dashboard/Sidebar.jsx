@@ -1,3 +1,5 @@
+import { auth } from '@/firebase/firebase-config'
+import { signOut } from 'firebase/auth'
 import {} from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
@@ -82,22 +84,27 @@ const sidebarLinks = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
       </svg>
     ),
-    onClick: () => {}
+    onClick: () => signOut(auth)
   }
 ]
 const Sidebar = () => {
   return (
     <SidebarStyles className="sidebar">
-      {/* <div className="sidebar-logo">
-        <img srcSet="/logo.png 2x" alt="" />
-        <span>Monkey Blogging</span>
-      </div> */}
-      {sidebarLinks.map((link, idx) => (
-        <NavLink key={idx} to={link.url} className="menu-item">
-          <span className="menu-icon">{link.icon}</span>
-          <span className="menu-text">{link.title}</span>
-        </NavLink>
-      ))}
+      {sidebarLinks.map((link, idx) => {
+        if (link.onClick)
+          return (
+            <div key={idx} to={link.url} onClick={link.onClick} className="menu-item">
+              <span className="menu-icon">{link.icon}</span>
+              <span className="menu-text">{link.title}</span>
+            </div>
+          )
+        return (
+          <NavLink key={idx} to={link.url} className="menu-item">
+            <span className="menu-icon">{link.icon}</span>
+            <span className="menu-text">{link.title}</span>
+          </NavLink>
+        )
+      })}
     </SidebarStyles>
   )
 }

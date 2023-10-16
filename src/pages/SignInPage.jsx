@@ -32,19 +32,22 @@ const SignInPage = () => {
     resolver: yupResolver(schema),
     mode: 'onChange'
   })
+
   useEffect(() => {
     const arrErrors = Object.values(errors)
     if (arrErrors.length > 0) {
       toast.error(arrErrors[0]?.message)
     }
   }, [errors])
+
   const handleSignIn = async (values) => {
     if (!isValid) return
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password)
       navigate('/')
     } catch (error) {
-      if (error.message.includes('wrong-password')) toast.error('It seems your password was wrong')
+      console.log('🐻 ~ file: SignInPage.jsx:49 ~ handleSignIn ~ error:', error.message)
+      if (error.message.includes('wrong-password') || error.message.includes('Firebase: Error (auth/user-not-found)')) toast.error('It seems your email or password was wrong')
     }
   }
 
