@@ -10,10 +10,11 @@ import { toast } from 'react-toastify'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { auth, db } from '@/firebase/firebase-config'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { addDoc, collection, doc, setDoc } from 'firebase/firestore'
+import { addDoc, collection, doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import AuthenticationPage from './AuthenticationPage'
 import InputPasswordToggle from '@/components/input/InputPasswordToggle'
 import slugify from 'slugify'
+import { userStatus, userRoles } from '@/utils/constants'
 
 const schema = yup.object({
   fullname: yup.string().required('Please enter your fullname'),
@@ -42,9 +43,10 @@ const SignUpPage = () => {
   })
   const handleSignUp = async (values) => {
     if (!isValid) return
-    const user = await createUserWithEmailAndPassword(auth, values.email, values.password)
+    await createUserWithEmailAndPassword(auth, values.email, values.password)
     await updateProfile(auth.currentUser, {
-      displayName: values.fullname
+      displayName: values.fullname,
+      photoURL: 'https://images.unsplash.com/photo-1520763185298-1b434c919102?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1932&q=80'
     })
     const colRef = collection(db, 'users')
 
@@ -52,7 +54,11 @@ const SignUpPage = () => {
       fullname: values.fullname,
       email: values.email,
       password: values.password,
-      username: slugify(values.fullname, { lower: true })
+      username: slugify(values.fullname, { lower: true }),
+      avatar: 'https://images.unsplash.com/photo-1520763185298-1b434c919102?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1932&q=80',
+      status: userStatus.ACTIVE,
+      role: userRoles.USER,
+      createdAt: serverTimestamp()
     })
 
     // await addDoc(colRef, {

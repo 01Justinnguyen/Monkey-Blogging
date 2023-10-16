@@ -36,8 +36,8 @@ export const userStatus = {
 export const userRoles = {
   ADMIN: 1,
   MODERATOR: 2,
-  EDITOR: 3,
-  USER: 4
+  // EDITOR: 3,
+  USER: 3
 }
 
 export const ITEM_PER_PAGE = 3
