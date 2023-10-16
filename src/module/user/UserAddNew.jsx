@@ -11,12 +11,16 @@ import { db } from '@/firebase/firebase-config'
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
 import { toast } from 'react-toastify'
 import InputPasswordToggle from '@/components/input/InputPasswordToggle'
+import ImageUpload from '@/components/image/ImageUpload'
+import useFireBaseImage from '@/hooks/useFirebaseImage'
 
 const UserAddNew = () => {
   const {
     control,
     handleSubmit,
     watch,
+    setValue,
+    getValues,
     reset,
     formState: { errors, isSubmitting, isValid }
   } = useForm({
@@ -24,12 +28,15 @@ const UserAddNew = () => {
     defaultValues: {
       fullname: '',
       username: '',
+      avatar: '',
       email: '',
       password: '',
       status: 1,
       role: 1
     }
   })
+
+  const { image, handleResetUpload, progress, handleSelectImage, handleDeleteImage } = useFireBaseImage(setValue, getValues)
 
   const handleAddNewUser = async (values) => {
     console.log('🐻 ~ file: UserAddNew.jsx:24 ~ handleAddNewUser ~ values:', values)
@@ -53,6 +60,7 @@ const UserAddNew = () => {
       reset({
         fullname: '',
         username: '',
+        avatar: '',
         email: '',
         password: '',
         status: 1,
@@ -67,6 +75,9 @@ const UserAddNew = () => {
     <div>
       <DashboardHeading title="New user" desc="Add new user to system"></DashboardHeading>
       <form onSubmit={handleSubmit(handleAddNewUser)}>
+        <div className="max-w-[200px] max-h-[200px] mx-auto rounded-full mb-10">
+          <ImageUpload className="!rounded-full" onChange={handleSelectImage} progress={progress} image={image} handleDeleteImage={handleDeleteImage} />
+        </div>
         <div className="form-layout">
           <Field>
             <Label>Fullname</Label>
@@ -111,9 +122,9 @@ const UserAddNew = () => {
               <Radio checked={Number(watchRoles) === userRoles.MODERATOR} value={userRoles.MODERATOR} name="role" control={control}>
                 Moderator
               </Radio>
-              <Radio checked={Number(watchRoles) === userRoles.EDITOR} value={userRoles.EDITOR} name="role" control={control}>
+              {/* <Radio checked={Number(watchRoles) === userRoles.EDITOR} value={userRoles.EDITOR} name="role" control={control}>
                 Editor
-              </Radio>
+              </Radio> */}
               <Radio checked={Number(watchRoles) === userRoles.USER} value={userRoles.USER} name="role" control={control}>
                 User
               </Radio>
