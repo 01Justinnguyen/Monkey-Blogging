@@ -99,7 +99,7 @@ const UserTable = () => {
         <td title={user.id}>{user.id.slice(0, 5) + '…'}</td>
         <td className="whitespace-nowrap">
           <div className="flex items-center gap-x-3">
-            <img className="flex-shrink-0 object-cover w-12 h-12 rounded-md" src={user?.avatar} alt="" />
+            <img className="flex-shrink-0 object-cover w-12 h-12 rounded-md" src={user?.avatar || 'https://source.unsplash.com/random'} alt="" />
             <div className="flex-1">
               <h3>{user?.fullname}</h3>
               <time className="text-sm text-gray-300">{new Date(user.createdAt?.seconds * 1000).toLocaleDateString('vi-VI')}</time>
