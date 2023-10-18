@@ -7,12 +7,14 @@ import DashboardHeading from '../dashboard/DashboardHeading'
 import {} from 'react'
 import { useForm } from 'react-hook-form'
 import { userStatus, userRoles } from '@/utils/constants'
-import { db } from '@/firebase/firebase-config'
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { auth, db } from '@/firebase/firebase-config'
+import { addDoc, collection, serverTimestamp, setDoc } from 'firebase/firestore'
 import { toast } from 'react-toastify'
 import InputPasswordToggle from '@/components/input/InputPasswordToggle'
 import ImageUpload from '@/components/image/ImageUpload'
 import useFireBaseImage from '@/hooks/useFirebaseImage'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+import slugify from 'slugify'
 
 const UserAddNew = () => {
   const {
@@ -31,29 +33,38 @@ const UserAddNew = () => {
       avatar: '',
       email: '',
       password: '',
-      status: 1,
-      role: 1
+      status: userStatus.ACTIVE,
+      role: userRoles.USER,
+      createdAt: new Date()
     }
   })
 
   const { image, handleResetUpload, progress, handleSelectImage, handleDeleteImage } = useFireBaseImage(setValue, getValues)
+  // console.log('🐻 ~ file: UserAddNew.jsx:41 ~ UserAddNew ~ image:', image)
 
   const handleAddNewUser = async (values) => {
     console.log('🐻 ~ file: UserAddNew.jsx:24 ~ handleAddNewUser ~ values:', values)
     if (!isValid) return
 
+    await createUserWithEmailAndPassword(auth, values.email, values.password)
+
+    const colRef = collection(db, 'users')
     //clone array
     const newValues = { ...values }
     newValues.status = Number(newValues.status)
     newValues.role = Number(newValues.role)
-    const colRef = collection(db, 'users')
-
+    newValues.username = slugify(newValues.username || newValues.fullname, {
+      lower: true,
+      replacement: ' ',
+      trim: true
+    })
+    newValues.avatar = image
     try {
       await addDoc(colRef, {
         ...newValues,
         createdAt: serverTimestamp()
       })
-      toast.success('Created category successfully')
+      toast.success('Created new user successfully')
     } catch (error) {
       toast.error(error.message)
     } finally {
@@ -63,8 +74,9 @@ const UserAddNew = () => {
         avatar: '',
         email: '',
         password: '',
-        status: 1,
-        role: 1
+        status: userStatus.ACTIVE,
+        role: userRoles.USER,
+        createdAt: new Date()
       })
     }
   }
@@ -75,8 +87,8 @@ const UserAddNew = () => {
     <div>
       <DashboardHeading title="New user" desc="Add new user to system"></DashboardHeading>
       <form onSubmit={handleSubmit(handleAddNewUser)}>
-        <div className="max-w-[200px] max-h-[200px] mx-auto rounded-full mb-10">
-          <ImageUpload className="!rounded-full" onChange={handleSelectImage} progress={progress} image={image} handleDeleteImage={handleDeleteImage} />
+        <div className="w-[200px] h-[200px] mx-auto rounded-full mb-10">
+          <ImageUpload className="!rounded-full h-full" onChange={handleSelectImage} image={image} handleDeleteImage={handleDeleteImage} />
         </div>
         <div className="form-layout">
           <Field>
