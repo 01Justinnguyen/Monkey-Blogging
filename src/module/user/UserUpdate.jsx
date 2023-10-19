@@ -1,94 +1,87 @@
 import { Button } from '@/components/button'
 import { Radio } from '@/components/checkbox'
 import { Field, FieldCheckboxes } from '@/components/field'
-import { Input } from '@/components/input'
-import { Label } from '@/components/label'
-import DashboardHeading from '../dashboard/DashboardHeading'
-import {} from 'react'
-import { useForm } from 'react-hook-form'
-import { userStatus, userRoles } from '@/utils/constants'
-import { auth, db } from '@/firebase/firebase-config'
-import { addDoc, collection, serverTimestamp, setDoc } from 'firebase/firestore'
-import { toast } from 'react-toastify'
 import InputPasswordToggle from '@/components/input/InputPasswordToggle'
-import ImageUpload from '@/components/image/ImageUpload'
-import useFireBaseImage from '@/hooks/useFirebaseImage'
-import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { Label } from '@/components/label'
+import { userRoles, userStatus } from '@/utils/constants'
+import { Input } from '@/components/input'
+import React, { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import DashboardHeading from '../dashboard/DashboardHeading'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { db } from '@/firebase/firebase-config'
+import { doc, getDoc, updateDoc } from 'firebase/firestore'
+import { toast } from 'react-toastify'
 import slugify from 'slugify'
 
-const UserAddNew = () => {
+const UserUpdate = () => {
   const {
     control,
     handleSubmit,
     watch,
-    setValue,
-    getValues,
     reset,
-    formState: { errors, isSubmitting, isValid }
+    formState: { isSubmitting, isValid }
   } = useForm({
-    mode: 'onChange',
-    defaultValues: {
-      fullname: '',
-      username: '',
-      avatar: '',
-      email: '',
-      password: '',
-      status: userStatus.ACTIVE,
-      role: userRoles.USER,
-      createdAt: new Date()
-    }
+    mode: 'onChange'
   })
 
-  const { image, handleResetUpload, progress, handleSelectImage, handleDeleteImage } = useFireBaseImage(setValue, getValues)
-  // console.log('🐻 ~ file: UserAddNew.jsx:41 ~ UserAddNew ~ image:', image)
+  const [params] = useSearchParams()
+  const userId = params.get('id')
+  const navigate = useNavigate()
 
-  const handleAddNewUser = async (values) => {
-    console.log('🐻 ~ file: UserAddNew.jsx:24 ~ handleAddNewUser ~ values:', values)
+  useEffect(() => {
+    async function getUserById() {
+      if (!userId) return
+      const docRef = doc(db, 'users', userId)
+      const docSnap = await getDoc(docRef)
+      if (docSnap.exists()) {
+        reset(docSnap.data())
+      } else {
+        console.log('No such document!')
+      }
+    }
+    getUserById()
+  }, [userId, reset])
+
+  const handleUpdateUser = async (values) => {
     if (!isValid) return
-
-    await createUserWithEmailAndPassword(auth, values.email, values.password)
-
-    const colRef = collection(db, 'users')
-    //clone array
-    const newValues = { ...values }
-    newValues.status = Number(newValues.status)
-    newValues.role = Number(newValues.role)
-    newValues.username = slugify(newValues.username || newValues.fullname, {
-      lower: true,
-      replacement: ' ',
-      trim: true
-    })
-    newValues.avatar = image
     try {
-      await addDoc(colRef, {
-        ...newValues,
-        createdAt: serverTimestamp()
+      const newValues = { ...values }
+      newValues.role = Number.parseInt(newValues.role)
+      newValues.status = Number.parseInt(newValues.status)
+      newValues.username = slugify(newValues.username || newValues.fullname, {
+        lower: true,
+        replacement: ' ',
+        strict: true,
+        trim: true,
+        remove: true
       })
-      toast.success('Created new user successfully')
+
+      const docRef = doc(db, 'users', userId)
+
+      await updateDoc(docRef, {
+        ...newValues
+      })
+      toast.success('Update category successfully!!!')
+      setTimeout(() => {
+        navigate('/manage/user')
+      }, 1000)
     } catch (error) {
-      toast.error(error.message)
-    } finally {
-      reset({
-        fullname: '',
-        username: '',
-        avatar: '',
-        email: '',
-        password: '',
-        status: userStatus.ACTIVE,
-        role: userRoles.USER,
-        createdAt: new Date()
-      })
+      console.log('🐻 ~ file: UserUpdate.jsx:70 ~ handleUpdateUser ~ error:', error.message)
+      toast.error('Update user failed!!!')
     }
   }
 
   const watchStatus = watch('status')
   const watchRoles = watch('role')
+
+  if (!userId) return null
   return (
     <div>
-      <DashboardHeading title="New user" desc="Add new user to system"></DashboardHeading>
-      <form onSubmit={handleSubmit(handleAddNewUser)}>
+      <DashboardHeading title="Update user" desc="Update user infomation"></DashboardHeading>
+      <form onSubmit={handleSubmit(handleUpdateUser)}>
         <div className="w-[200px] h-[200px] mx-auto rounded-full mb-10">
-          <ImageUpload className="!rounded-full h-full" onChange={handleSelectImage} image={image} handleDeleteImage={handleDeleteImage} />
+          {/* <ImageUpload className="!rounded-full h-full" onChange={handleSelectImage} image={image} handleDeleteImage={handleDeleteImage} /> */}
         </div>
         <div className="form-layout">
           <Field>
@@ -141,11 +134,11 @@ const UserAddNew = () => {
           </Field>
         </div>
         <Button type="submit" kind="primary" className="mx-auto w-[200px]" isloading={isSubmitting} disabled={isSubmitting}>
-          Add new user
+          Update User
         </Button>
       </form>
     </div>
   )
 }
 
-export default UserAddNew
+export default UserUpdate

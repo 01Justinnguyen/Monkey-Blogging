@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom'
 import DashboardHeading from '../dashboard/DashboardHeading'
 import Swal from 'sweetalert2'
 import { userRoles, userStatus } from '@/utils/constants'
+import { deleteUser } from 'firebase/auth'
 const UserTable = () => {
   const navigate = useNavigate()
   const [userList, setUserList] = useState([])
@@ -47,8 +48,9 @@ const UserTable = () => {
   // }, 500)
 
   //handle delete category
-  const handleDeleteUser = async (docId) => {
-    const colRef = doc(db, 'users', docId)
+  const handleDeleteUser = async (user) => {
+    console.log('🐻 ~ file: UserTable.jsx:52 ~ handleDeleteUser ~ user:', user)
+    const colRef = doc(db, 'users', user.id)
     Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -60,6 +62,7 @@ const UserTable = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await deleteDoc(colRef)
+        // await deleteUser(user)
         Swal.fire('Deleted!', 'Your user has been deleted.', 'success')
       }
     })
@@ -113,8 +116,8 @@ const UserTable = () => {
         <td>
           <div className="flex items-center gap-x-3">
             {/* <ActionView></ActionView> */}
-            <ActionEdit></ActionEdit>
-            <ActionDelete onClick={() => handleDeleteUser(user.id)}></ActionDelete>
+            <ActionEdit onClick={() => navigate(`/manage/update-user?id=${user.id}`)}></ActionEdit>
+            <ActionDelete onClick={() => handleDeleteUser(user)}></ActionDelete>
           </div>
         </td>
       </tr>
