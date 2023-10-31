@@ -5,7 +5,7 @@ import InputPasswordToggle from '@/components/input/InputPasswordToggle'
 import { Label } from '@/components/label'
 import { userRoles, userStatus } from '@/utils/constants'
 import { Input } from '@/components/input'
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import DashboardHeading from '../dashboard/DashboardHeading'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -13,35 +13,32 @@ import { db } from '@/firebase/firebase-config'
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { toast } from 'react-toastify'
 import slugify from 'slugify'
+import ImageUpload from '@/components/image/ImageUpload'
+import useFireBaseImage from '@/hooks/useFirebaseImage'
 
 const UserUpdate = () => {
   const {
     control,
     handleSubmit,
     watch,
+    setValue,
+    getValues,
     reset,
     formState: { isSubmitting, isValid }
   } = useForm({
     mode: 'onChange'
   })
 
+  const navigate = useNavigate()
   const [params] = useSearchParams()
   const userId = params.get('id')
-  const navigate = useNavigate()
+  const watchStatus = watch('status')
+  const watchRoles = watch('role')
+  const imageUrl = getValues('avatar')
+  const imageRegex = /%2F(\S+)\?/gm.exec(imageUrl)
+  const imageName = imageRegex?.length > 0 ? /%2F(\S+)\?/gm.exec(imageUrl)[1] : ''
 
-  useEffect(() => {
-    async function getUserById() {
-      if (!userId) return
-      const docRef = doc(db, 'users', userId)
-      const docSnap = await getDoc(docRef)
-      if (docSnap.exists()) {
-        reset(docSnap.data())
-      } else {
-        console.log('No such document!')
-      }
-    }
-    getUserById()
-  }, [userId, reset])
+  const { image, setImage, handleSelectImage, handleDeleteImage } = useFireBaseImage(setValue, getValues, imageName, deleteAvatar)
 
   const handleUpdateUser = async (values) => {
     if (!isValid) return
@@ -56,11 +53,10 @@ const UserUpdate = () => {
         trim: true,
         remove: true
       })
-
       const docRef = doc(db, 'users', userId)
-
       await updateDoc(docRef, {
-        ...newValues
+        ...newValues,
+        avatar: image
       })
       toast.success('Update category successfully!!!')
       setTimeout(() => {
@@ -72,16 +68,42 @@ const UserUpdate = () => {
     }
   }
 
-  const watchStatus = watch('status')
-  const watchRoles = watch('role')
+  async function deleteAvatar() {
+    const docRef = doc(db, 'users', userId)
+    await updateDoc(docRef, {
+      avatar: ''
+    })
+  }
+
+  useEffect(() => {
+    setImage(imageUrl)
+  }, [imageUrl, setImage])
+
+  useEffect(() => {
+    async function getUserById() {
+      try {
+        if (!userId) return
+        const docRef = doc(db, 'users', userId)
+        const docSnap = await getDoc(docRef)
+        if (docSnap.exists()) {
+          reset(docSnap.data())
+        } else {
+          console.log('No such document!')
+        }
+      } catch (error) {
+        console.log('🐻 ~ file: UserUpdate.jsx:52 ~ getUserById ~ error:', error.message)
+      }
+    }
+    getUserById()
+  }, [userId, reset])
 
   if (!userId) return null
   return (
     <div>
-      <DashboardHeading title="Update user" desc="Update user infomation"></DashboardHeading>
+      <DashboardHeading title="Update user" desc="Update user information"></DashboardHeading>
       <form onSubmit={handleSubmit(handleUpdateUser)}>
         <div className="w-[200px] h-[200px] mx-auto rounded-full mb-10">
-          {/* <ImageUpload className="!rounded-full h-full" onChange={handleSelectImage} image={image} handleDeleteImage={handleDeleteImage} /> */}
+          <ImageUpload className="!rounded-full h-full" onChange={handleSelectImage} image={image} handleDeleteImage={handleDeleteImage} />
         </div>
         <div className="form-layout">
           <Field>

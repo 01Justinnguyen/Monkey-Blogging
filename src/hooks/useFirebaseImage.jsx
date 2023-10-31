@@ -1,7 +1,7 @@
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage'
 import { useState } from 'react'
 
-const useFireBaseImage = (setValue, getValues) => {
+const useFireBaseImage = (setValue, getValues, imageName = null, cb) => {
   const [progress, setProgress] = useState(0)
   const [image, setImage] = useState('')
 
@@ -38,6 +38,7 @@ const useFireBaseImage = (setValue, getValues) => {
           console.log('File available at', downloadURL)
           setImage(downloadURL)
           setProgress(0)
+          cb && cb()
         })
       }
     )
@@ -52,7 +53,7 @@ const useFireBaseImage = (setValue, getValues) => {
 
   const handleDeleteImage = () => {
     const storage = getStorage()
-    const imageRef = ref(storage, 'images/' + getValues('imageName'))
+    const imageRef = ref(storage, 'images/' + imageName || getValues('imageName'))
     deleteObject(imageRef)
       .then(() => {
         console.log('Xoá thành công ảnh rồi nhé')
@@ -72,6 +73,7 @@ const useFireBaseImage = (setValue, getValues) => {
   return {
     image,
     progress,
+    setImage,
     handleSelectImage,
     handleDeleteImage,
     handleResetUpload
